@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planning de Planification des Structures</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/fr.js"></script>
+
+    <style>
+        /* CSS pour un design moderne et épuré */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --background-color: #f8f9fa;
+            --surface-color: #ffffff;
+            --border-color: #dee2e6;
+            --text-color: #212529;
+            --weekend-bg: #fdf2f2;
+            --holiday-bg: #fefce8;
+            --preparation-bg: #e9ecef;
+            --event-border-color: #6b7280;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 1rem;
+            font-size: 14px;
+        }
+
+        /* --- CONTROLS / FORMULAIRE --- */
+        .controls-container {
+            background-color: var(--surface-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+        
+        .controls-container h1 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1rem 1.5rem;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-field label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-field input,
+        .form-field select {
+            padding: 0.6rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1em;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: #fff;
+        }
+
+        .form-field input:focus,
+        .form-field select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
+        .form-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
+
+        .form-actions button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .form-actions button:hover {
+            background-color: #0056b3;
+        }
+
+        /* --- PLANNING CONTROLS --- */
+        .planning-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        #currentMonthYear {
+            font-size: 1.25rem;
+            font-weight: 600;
+            min-width: 150px;
+            text-align: center;
+        }
+        
+        .view-switcher button {
+             background-color: var(--surface-color);
+             border: 1px solid var(--border-color);
+             padding: 0.5rem 1rem;
+             cursor: pointer;
+        }
+        .view-switcher button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        .view-switcher button:first-child { border-radius: 6px 0 0 6px; }
+        .view-switcher button:last-child { border-radius: 0 6px 6px 0; }
+
+        /* --- PLANNING GRID --- */
+        .planning-container {
+            overflow-x: auto;
+            background-color: var(--surface-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        table.planning-grid {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            min-width: 2800px;
+        }
+
+        .planning-grid th, .planning-grid td {
+            border: 1px solid var(--border-color);
+            padding: 0.5rem;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+
+        .planning-grid th {
+            background-color: #f2f2f2;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .planning-grid th.main-header {
+            background-color: #e2e2e2;
+            top: 0;
+        }
+
+        .planning-grid th.sub-header {
+             background-color: #f2f2f2;
+             top: 41px;
+        }
+
+        .planning-grid .date-col {
+            min-width: 100px;
+            font-weight: 500;
+            background-color: var(--surface-color);
+            position: sticky;
+            left: 0;
+            z-index: 5;
+        }
+
+        .planning-grid .weekend { background-color: var(--weekend-bg); }
+        .planning-grid .holiday { background-color: var(--holiday-bg); }
+
+        .planning-grid tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .inventory-col {
+            font-weight: bold;
+            background-color: #e6f7ff !important;
+        }
+
+        /* --- EVENTS ON PLANNING --- */
+        .event-container {
+            position: relative;
+        }
+
+        .event-block {
+            position: absolute;
+            z-index: 20;
+            box-sizing: border-box;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 6px;
+            font-size: 0.85em;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            transition: background-color 0.2s, border-left-color 0.2s;
+            cursor: pointer;
+        }
+
+        .event-block.preparation-period {
+            background-color: var(--preparation-bg);
+            border-left: 5px solid var(--secondary-color);
+            z-index: 15;
+        }
+
+        .event-block.manifestation-period {
+            color: white;
+            background-color: #3b82f6;
+            border-left: 5px solid #1d4ed8;
+        }
+        .event-block.manifestation-period:hover {
+            background-color: #2563eb;
+        }
+
+        .event-block .event-line {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.3;
+        }
+
+        .event-block .event-contrat { font-weight: 700; }
+        .event-block .event-ville { font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <div class="controls-container">
+        <h1>Ajouter une Réservation</h1>
+        <form id="reservationForm" class="form-grid">
+            <div class="form-field">
+                <label for="contrat">Contrat N°</label>
+                <input type="text" id="contrat" placeholder="ex: DLR42665" required>
+            </div>
+            <div class="form-field">
+                <label for="ville">Ville</label>
+                <input type="text" id="ville" placeholder="ex: Paris" required>
+            </div>
+             <div class="form-field">
+                <label for="structure">Structure</label>
+                <select id="structure" required>
+                    <option value="15M">15M</option>
+                    <option value="20M">20M</option>
+                    <option value="25M">25M</option>
+                    <option value="10M_H5">10M H5</option>
+                    <option value="10M_H4">10M H4</option>
+                    <option value="12M">12M</option>
+                </select>
+            </div>
+            <div class="form-field">
+                <label for="longueur">Longueur (m)</label>
+                <select id="longueur" required></select>
+            </div>
+            <div class="form-field">
+                <label for="hauteur">Hauteur</label>
+                <select id="hauteur" required>
+                    <option value="H3">H3</option>
+                    <option value="H4">H4</option>
+                </select>
+            </div>
+             <div class="form-field">
+                <label for="plancher">Plancher</label>
+                <select id="plancher" required>
+                    <option value="AP">AP (Avec Plancher)</option>
+                    <option value="SP">SP (Sans Plancher)</option>
+                </select>
+            </div>
+
+            <div class="form-field">
+                <label for="dateManif">Date(s) Manifestation</label>
+                <input type="text" id="dateManif" placeholder="Sélectionner une plage de dates" required>
+            </div>
+            <div class="form-field">
+                <label for="dateMontage">Date(s) Montage</label>
+                <input type="text" id="dateMontage" placeholder="Sélectionner une plage de dates" required>
+            </div>
+            <div class="form-field">
+                <label for="dateDemontage">Date(s) Démontage</label>
+                <input type="text" id="dateDemontage" placeholder="Sélectionner une plage de dates" required>
+            </div>
+            
+            <div class="form-field">
+                <label for="delaiPrep">Délai Préparation (jours)</label>
+                <input type="number" id="delaiPrep" value="4" min="0" required>
+            </div>
+            <div class="form-field">
+                <label for="dispo">Demande de dispo</label>
+                <select id="dispo" required>
+                    <option value="Non" selected>Non</option>
+                    <option value="Oui">Oui</option>
+                </select>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit">Ajouter au Planning</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="planning-controls">
+        <div class="nav-controls">
+            <h2 id="currentMonthYear"></h2>
+        </div>
+        <div class="view-switcher">
+            <button id="dayViewBtn">Jour</button>
+            <button id="weekViewBtn" class="active">Semaine</button>
+        </div>
+    </div>
+    
+    <div id="eventContainer" class="event-container">
+        <div class="planning-container">
+            <table class="planning-grid" id="planningGrid"></table>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- CONFIGURATION & INITIAL STATE ---
+            const structureInventory = {
+                "10M_H5": { name: "10*10 Arquée H5", cols: 1, startCol: 1 },
+                "10M_H4": { name: "10*50 Arquée H4", cols: 1, startCol: 2 },
+                "12M":    { name: "12*25 Arquée H3", cols: 1, startCol: 3 },
+                "15M":    { name: "15M Arquée",      cols: 8, startCol: 4, sub: ["H3", "H3", "H3", "H3", "H3", "H3", "H3/H4", "H3/H4"], fermes: 51 },
+                "20M":    { name: "20M Arquée",      cols: 7, startCol: 13, sub: ["H3", "H3", "H3", "H3", "H3/H4", "H3/H4", "H3/H4"], fermes: 54 },
+                "25M":    { name: "25M Arquée",      cols: 3, startCol: 20, sub: ["H3", "H3", "H3"], fermes: 54 },
+                "Domes":  { name: "Domes",           cols: 1, startCol: 24, count: 89 },
+            };
+
+            let reservations = [];
+            let currentDate = new Date(2026, 0, 1); // Start at January 1, 2026
+            let currentView = 'week';
+
+            // --- DOM ELEMENTS ---
+            const planningGrid = document.getElementById('planningGrid');
+            const currentMonthYearEl = document.getElementById('currentMonthYear');
+            const form = document.getElementById('reservationForm');
+            const longueurSelect = document.getElementById('longueur');
+
+            // --- INITIALIZATION ---
+            populateLongueurOptions();
+            initializeDatePickers(); 
+            render();
+
+            // --- EVENT LISTENERS ---
+            document.getElementById('weekViewBtn').addEventListener('click', () => switchView('week'));
+            document.getElementById('dayViewBtn').addEventListener('click', () => switchView('day'));
+            form.addEventListener('submit', handleFormSubmit);
+
+            // --- FUNCTIONS ---
+
+            function initializeDatePickers() {
+                const config = {
+                    mode: "range",
+                    dateFormat: "d/m/Y", 
+                    locale: "fr",
+                    minDate: "01/01/2026",
+                    maxDate: "31/12/2026"
+                };
+                flatpickr("#dateManif", config);
+                flatpickr("#dateMontage", config);
+                flatpickr("#dateDemontage", config);
+            }
+            
+            function switchView(view) {
+                currentView = view;
+                document.getElementById('weekViewBtn').classList.toggle('active', view === 'week');
+                document.getElementById('dayViewBtn').classList.toggle('active', view === 'day');
+                render();
+            }
+
+            function getFrenchPublicHolidays(year) {
+                const holidays = new Set();
+                const easter = getEaster(year);
+                const yearStr = year.toString();
+                holidays.add(`${yearStr}-01-01`); holidays.add(`${yearStr}-05-01`); holidays.add(`${yearStr}-05-08`);
+                holidays.add(`${yearStr}-07-14`); holidays.add(`${yearStr}-08-15`); holidays.add(`${yearStr}-11-01`);
+                holidays.add(`${yearStr}-11-11`); holidays.add(`${yearStr}-12-25`);
+                const addDays = (d, days) => { const r = new Date(d); r.setDate(r.getDate() + days); return r.toISOString().split('T')[0]; };
+                holidays.add(addDays(easter, 1)); holidays.add(addDays(easter, 39)); holidays.add(addDays(easter, 50));
+                return holidays;
+            }
+
+            function getEaster(year) {
+                const a = year % 19, b = Math.floor(year / 100), c = year % 100, d = Math.floor(b / 4), e = b % 4;
+                const f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
+                const i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7;
+                const m = Math.floor((a + 11 * h + 22 * l) / 451);
+                const month = Math.floor((h + l - 7 * m + 114) / 31), day = ((h + l - 7 * m + 114) % 31) + 1;
+                return new Date(year, month - 1, day);
+            }
+
+            function populateLongueurOptions() {
+                longueurSelect.innerHTML = '';
+                for (let i = 0; i <= 100; i += 5) {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.textContent = `${i}m`;
+                    longueurSelect.appendChild(option);
+                }
+            }
+            
+            function getDatesForView() {
+                const dates = [];
+                const year = 2026;
+                const start = new Date(year, 0, 1); // January 1, 2026
+
+                if (currentView === 'week') {
+                    // Start from the first Saturday of 2026
+                    const firstSaturday = new Date(year, 0, 1);
+                    while (firstSaturday.getDay() !== 6) {
+                        firstSaturday.setDate(firstSaturday.getDate() + 1);
+                    }
+                    // Generate all Saturdays of 2026
+                    for (let d = new Date(firstSaturday); d.getFullYear() === year; d.setDate(d.getDate() + 7)) {
+                        dates.push(new Date(d));
+                    }
+                } else {
+                    // Generate all days of 2026
+                    for (let d = new Date(start); d.getFullYear() === year; d.setDate(d.getDate() + 1)) {
+                        dates.push(new Date(d));
+                    }
+                    if (new Date(year + 1, 0, 1).getFullYear() === year + 1) {
+                        dates.push(new Date(year + 1, 0, 1)); // Include Jan 1, 2027 for continuity
+                    }
+                }
+                return dates;
+            }
+
+            function render() {
+                planningGrid.innerHTML = '';
+                const dates = getDatesForView();
+                currentMonthYearEl.textContent = 'Année 2026';
+                generateGridHeader();
+                generateGridBody(dates);
+                renderReservations(dates);
+            }
+            
+            function generateGridHeader() {
+                const thead = document.createElement('thead');
+                const mainHeaderRow = document.createElement('tr'), subHeaderRow = document.createElement('tr');
+                const createTh = (text, colspan = 1, className = '') => {
+                    const th = document.createElement('th'); th.textContent = text; th.colSpan = colspan;
+                    if (className) th.classList.add(className); return th;
+                };
+
+                mainHeaderRow.appendChild(createTh(currentView === 'week' ? 'Semaine' : 'Date', 1, 'main-header'));
+                subHeaderRow.appendChild(createTh('', 1, 'sub-header'));
+                mainHeaderRow.appendChild(createTh(structureInventory['10M_H5'].name, 1, 'main-header')); subHeaderRow.appendChild(createTh('', 1, 'sub-header'));
+                mainHeaderRow.appendChild(createTh(structureInventory['10M_H4'].name, 1, 'main-header')); subHeaderRow.appendChild(createTh('', 1, 'sub-header'));
+                mainHeaderRow.appendChild(createTh(structureInventory['12M'].name, 1, 'main-header')); subHeaderRow.appendChild(createTh('', 1, 'sub-header'));
+                mainHeaderRow.appendChild(createTh(structureInventory['15M'].name, structureInventory['15M'].cols, 'main-header'));
+                (structureInventory['15M'].sub || []).forEach(sub => subHeaderRow.appendChild(createTh(sub, 1, 'sub-header')));
+                mainHeaderRow.appendChild(createTh('Fermes', 1, 'main-header')); subHeaderRow.appendChild(createTh('51', 1, 'sub-header'));
+                mainHeaderRow.appendChild(createTh(currentView === 'week' ? 'Semaine' : 'Date', 1, 'main-header')); subHeaderRow.appendChild(createTh('', 1, 'sub-header'));
+                mainHeaderRow.appendChild(createTh(structureInventory['20M'].name, structureInventory['20M'].cols, 'main-header'));
+                (structureInventory['20M'].sub || []).forEach(sub => subHeaderRow.appendChild(createTh(sub, 1, 'sub-header')));
+                mainHeaderRow.appendChild(createTh(structureInventory['25M'].name, structureInventory['25M'].cols, 'main-header'));
+                (structureInventory['25M'].sub || []).forEach(sub => subHeaderRow.appendChild(createTh(sub, 1, 'sub-header')));
+                mainHeaderRow.appendChild(createTh('Fermes', 1, 'main-header')); subHeaderRow.appendChild(createTh('54', 1, 'sub-header'));
+                mainHeaderRow.appendChild(createTh(structureInventory['Domes'].name, structureInventory['Domes'].cols, 'main-header'));
+                subHeaderRow.appendChild(createTh(structureInventory['Domes'].count.toString(), 1, 'sub-header'));
+                thead.appendChild(mainHeaderRow); thead.appendChild(subHeaderRow);
+                planningGrid.appendChild(thead);
+            }
+            
+            function generateGridBody(dates) {
+                const tbody = document.createElement('tbody');
+                const currentYear = 2026;
+                const holidays = getFrenchPublicHolidays(currentYear);
+                const nextYearHolidays = getFrenchPublicHolidays(currentYear + 1);
+                nextYearHolidays.forEach(h => holidays.add(h));
+
+                dates.forEach(date => {
+                    const dateString = date.toISOString().split('T')[0];
+                    const tr = document.createElement('tr');
+                    tr.dataset.date = dateString;
+                    const day = date.getDay();
+                    if (day === 0 || day === 6) tr.classList.add('weekend');
+                    if (holidays.has(dateString)) tr.classList.add('holiday');
+                    const dateLocale = currentView === 'week' ? 
+                        `Sem. ${date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}` : 
+                        date.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
+                    
+                    let rowHtml = `<td class="date-col">${dateLocale}</td>`;
+                    rowHtml += `<td></td>`.repeat(Object.values(structureInventory).reduce((acc, s) => acc + s.cols, 0) + 4);
+                    tr.innerHTML = rowHtml;
+
+                    tr.cells[structureInventory['15M'].startCol + structureInventory['15M'].cols].classList.add('inventory-col');
+                    tr.cells[structureInventory['15M'].startCol + structureInventory['15M'].cols].textContent = structureInventory['15M'].fermes;
+                    tr.cells[structureInventory['15M'].startCol + structureInventory['15M'].cols + 1].classList.add('date-col');
+                    tr.cells[structureInventory['15M'].startCol + structureInventory['15M'].cols + 1].textContent = dateLocale;
+                    tr.cells[structureInventory['25M'].startCol + structureInventory['25M'].cols].classList.add('inventory-col');
+                    tr.cells[structureInventory['25M'].startCol + structureInventory['25M'].cols].textContent = structureInventory['25M'].fermes;
+                    tr.cells[structureInventory['Domes'].startCol + structureInventory['Domes'].cols].classList.add('inventory-col');
+                    tr.cells[structureInventory['Domes'].startCol + structureInventory['Domes'].cols].textContent = structureInventory['Domes'].count;
+
+                    tbody.appendChild(tr);
+                });
+                planningGrid.appendChild(tbody);
+            }
+
+            function findAvailableColumn(structureType, startDate, endDate) {
+                const structure = structureInventory[structureType];
+                if (!structure) return -1;
+
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                
+                for (let i = 0; i < structure.cols; i++) {
+                    const colIndex = structure.startCol + i;
+                    let isAvailable = true;
+
+                    for (const res of reservations) {
+                        if (res.columnIndex === colIndex) {
+                            const resStart = new Date(res.overallStartDate);
+                            const resEnd = new Date(res.overallEndDate);
+                            if (start <= resEnd && end >= resStart) {
+                                isAvailable = false;
+                                break;
+                            }
+                        }
+                    }
+                    if (isAvailable) {
+                        return colIndex;
+                    }
+                }
+                return -1;
+            }
+            
+            function handleFormSubmit(event) {
+                event.preventDefault();
+                
+                const parseDateRange = (inputID) => {
+                    const value = document.getElementById(inputID).value;
+                    if (!value) return { start: null, end: null };
+                    const dates = value.split(' au ');
+                    const toISODate = (dmy) => {
+                        const parts = dmy.split('/');
+                        return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+                    };
+                    return { start: toISODate(dates[0]), end: toISODate(dates.length > 1 ? dates[1] : dates[0]) };
+                };
+
+                const manif = parseDateRange('dateManif');
+                const montage = parseDateRange('dateMontage');
+                const demontage = parseDateRange('dateDemontage');
+
+                if (!manif.start || !montage.start || !demontage.start) {
+                    alert("Veuillez sélectionner des dates pour toutes les périodes.");
+                    return;
+                }
+
+                const data = {
+                    id: Date.now(),
+                    contrat: document.getElementById('contrat').value,
+                    ville: document.getElementById('ville').value,
+                    structure: document.getElementById('structure').value,
+                    longueur: parseInt(document.getElementById('longueur').value, 10),
+                    hauteur: document.getElementById('hauteur').value,
+                    plancher: document.getElementById('plancher').value,
+                    dateManifStart: manif.start, dateManifEnd: manif.end,
+                    dateMontageStart: montage.start, dateMontageEnd: montage.end,
+                    dateDemontageStart: demontage.start, dateDemontageEnd: demontage.end,
+                    delaiPrep: parseInt(document.getElementById('delaiPrep').value, 10),
+                };
+
+                if (new Date(data.dateMontageStart) > new Date(data.dateManifStart) || new Date(data.dateManifEnd) > new Date(data.dateDemontageStart)) {
+                    alert("Les dates ne sont pas cohérentes. (Ordre: Montage -> Manif -> Démontage)");
+                    return;
+                }
+
+                const prepStartDate = new Date(data.dateMontageStart);
+                prepStartDate.setDate(prepStartDate.getDate() - data.delaiPrep);
+                data.overallStartDate = prepStartDate.toISOString().split('T')[0];
+                data.overallEndDate = data.dateDemontageEnd;
+
+                const availableColumn = findAvailableColumn(data.structure, data.overallStartDate, data.overallEndDate);
+
+                if (availableColumn === -1) {
+                    alert(`Aucune colonne disponible pour la structure ${data.structure} sur cette période.`);
+                    return;
+                }
+
+                data.columnIndex = availableColumn;
+                
+                reservations.push(data);
+                render();
+                form.reset();
+                populateLongueurOptions();
+                initializeDatePickers(); 
+            }
+            
+            function renderReservations(visibleDates) {
+                document.querySelectorAll('.event-block').forEach(el => el.remove());
+                const firstVisibleDate = visibleDates[0], lastVisibleDate = visibleDates[visibleDates.length - 1];
+                
+                reservations.forEach(res => {
+                    const overallStartDate = new Date(res.overallStartDate);
+                    const overallEndDate = new Date(res.overallEndDate);
+
+                    if (overallEndDate < firstVisibleDate || overallStartDate > lastVisibleDate) return;
+                    
+                    createEventBlock(res, 'preparation', overallStartDate, new Date(res.dateMontageStart), res.columnIndex, visibleDates);
+                    createEventBlock(res, 'manifestation', new Date(res.dateMontageStart), overallEndDate, res.columnIndex, visibleDates);
+                });
+            }
+            
+            function createEventBlock(res, type, startDate, endDate, column, visibleDates) {
+                const block = document.createElement('div');
+                block.classList.add('event-block');
+                const tableHeader = planningGrid.querySelector('thead'), tableBody = planningGrid.querySelector('tbody');
+                if (!tableBody) return;
+
+                const gridStartDate = visibleDates[0];
+                const effectiveStartDate = startDate > gridStartDate ? startDate : gridStartDate;
+                const effectiveEndDate = endDate < visibleDates[visibleDates.length - 1] ? endDate : visibleDates[visibleDates.length - 1];
+                
+                let startRow, durationRows;
+
+                if (currentView === 'week') {
+                    const firstSaturday = new Date(2026, 0, 1);
+                    while (firstSaturday.getDay() !== 6) {
+                        firstSaturday.setDate(firstSaturday.getDate() + 1);
+                    }
+                    const weekDiff = (d2, d1) => Math.round((new Date(d2) - new Date(d1)) / (7 * 24 * 60 * 60 * 1000));
+                    startRow = weekDiff(effectiveStartDate, firstSaturday);
+                    durationRows = weekDiff(effectiveEndDate, effectiveStartDate) + 1;
+                } else {
+                    const dayDiff = (d2, d1) => Math.round((new Date(d2) - new Date(d1)) / 86400000);
+                    startRow = dayDiff(effectiveStartDate, gridStartDate);
+                    durationRows = dayDiff(effectiveEndDate, effectiveStartDate) + 1;
+                }
+
+                if (startRow < 0 || durationRows <= 0) return;
+                if (startRow + durationRows > tableBody.rows.length) {
+                    durationRows = tableBody.rows.length - startRow;
+                }
+
+                const rowHeight = tableBody.rows[0].offsetHeight;
+                const cell = tableBody.rows[startRow].cells[column];
+                if (!cell) return;
+
+                block.style.top = `${tableHeader.offsetHeight + startRow * rowHeight}px`;
+                block.style.left = `${cell.offsetLeft}px`;
+                block.style.width = `${cell.offsetWidth}px`;
+                block.style.height = `${durationRows * rowHeight - 2}px`;
+                
+                if (type === 'preparation') {
+                    block.classList.add('preparation-period');
+                    block.innerHTML = `<span class="event-line">Préparation</span>`;
+                } else {
+                    block.classList.add('manifestation-period');
+                    const formatRange = (s, e) => {
+                         const sd = new Date(s).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+                         const ed = new Date(e).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+                         return sd === ed ? sd : `${sd} - ${ed}`;
+                    };
+                    block.innerHTML = `
+                        <span class="event-line event-contrat">${res.contrat}</span>
+                        <span class="event-line event-ville">${res.ville}</span>
+                        <span class="event-line">${res.structure.replace('_', ' ')} ${res.longueur}m ${res.hauteur} ${res.plancher}</span>
+                        <span class="event-line">M: ${formatRange(res.dateMontageStart, res.dateMontageEnd)}</span>
+                        <span class="event-line">D: ${formatRange(res.dateDemontageStart, res.dateDemontageEnd)}</span>
+                    `;
+                }
+                document.getElementById('eventContainer').appendChild(block);
+            }
+        });
+    </script>
+
+</body>
+</html>
