@@ -386,6 +386,15 @@
                     const opt = document.createElement('option'); opt.value = i; opt.textContent = `${i}m`; longueurSelect.appendChild(opt);
                 }
             }
+
+            // MODIFICATION : Ajout de la fonction de calcul des fermes
+            function calculateFermes(longueur) {
+                if (longueur === 0) {
+                    return 0;
+                }
+                // La formule est (longueur / 5) + 1
+                return (longueur / 5) + 1;
+            }
             
             function getDatesForView() {
                 const dates = [], year = 2026;
@@ -424,7 +433,7 @@
                 const s15 = structureInventory['15M'];
                 mainHeaderRow.appendChild(createTh(s15.name, s15.cols, `main-header ${s15.cssClass}`));
                 s15.sub.forEach(sub => subHeaderRow.appendChild(createTh(sub, 1, `sub-header ${s15.cssClass}`)));
-                mainHeaderRow.appendChild(createTh('Fermes', 1, 'main-header')); subHeaderRow.appendChild(createTh('51', 1, 'sub-header'));
+                mainHeaderRow.appendChild(createTh('Fermes', 1, 'main-header')); subHeaderRow.appendChild(createTh(s15.fermes, 1, 'sub-header')); // Affiche le stock total
 
                 mainHeaderRow.appendChild(createTh(currentView === 'week' ? 'Semaine' : 'Date', 1, 'main-header')); subHeaderRow.appendChild(createTh('', 1, 'sub-header'));
 
@@ -433,7 +442,7 @@
                     mainHeaderRow.appendChild(createTh(s.name, s.cols, `main-header ${s.cssClass}`));
                     s.sub.forEach(sub => subHeaderRow.appendChild(createTh(sub, 1, `sub-header ${s.cssClass}`)));
                 });
-                mainHeaderRow.appendChild(createTh('Fermes', 1, 'main-header')); subHeaderRow.appendChild(createTh('54', 1, 'sub-header'));
+                mainHeaderRow.appendChild(createTh('Fermes', 1, 'main-header')); subHeaderRow.appendChild(createTh(structureInventory['20M'].fermes, 1, 'sub-header')); // Affiche le stock total
                 
                 const sDomes = structureInventory['Domes'];
                 mainHeaderRow.appendChild(createTh(sDomes.name, sDomes.cols, `main-header ${sDomes.cssClass}`));
@@ -443,23 +452,38 @@
                 planningGrid.appendChild(thead);
             }
             
+            // MODIFICATION : La fonction generateGridBody est entièrement mise à jour pour calculer le stock restant
             function generateGridBody(dates) {
                 const tbody = document.createElement('tbody');
                 const holidays = getFrenchPublicHolidays();
+                const totalFermes15M = structureInventory['15M'].fermes;
+                const totalFermes20_25M = structureInventory['20M'].fermes; // 20M et 25M partagent le même stock
+
                 dates.forEach(date => {
                     const tr = document.createElement('tr');
-                    // Correction du problème de fuseau horaire en utilisant UTC
                     const localDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
                     const dateString = localDate.toISOString().slice(0, 10);
                     tr.dataset.date = dateString;
                     
+                    // Calcul du stock de fermes restant pour cette date
+                    let remainingFermes15M = totalFermes15M;
+                    let remainingFermes20_25M = totalFermes20_25M;
+                    reservations.forEach(res => {
+                        if (dateString >= res.overallStartDate && dateString <= res.overallEndDate) {
+                            if (res.structure === '15M') {
+                                remainingFermes15M -= res.fermes;
+                            } else if (res.structure === '20M' || res.structure === '25M') {
+                                remainingFermes20_25M -= res.fermes;
+                            }
+                        }
+                    });
+
                     const createCell = (className = '') => {
                         const td = document.createElement('td');
                         if(className) td.className = className;
                         return td;
                     }
                     
-                    // Utilisation d'une date locale pour l'affichage
                     const displayDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
                     const dateLocale = currentView === 'week' ? 
                         `Sem. ${displayDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}` : 
@@ -470,21 +494,30 @@
                         const s = structureInventory[key];
                         for(let i = 0; i < s.cols; i++) tr.appendChild(createCell(s.cssClass));
                     });
-                    tr.appendChild(createCell('inventory-col'));
+
+                    // Affiche le stock restant de fermes 15M
+                    const fermes15MCell = createCell('inventory-col');
+                    fermes15MCell.textContent = remainingFermes15M;
+                    tr.appendChild(fermes15MCell);
+                    
                     tr.appendChild(createCell('date-col')).textContent = dateLocale;
+                    
                     ['20M', '25M'].forEach(key => {
                         const s = structureInventory[key];
                         for(let i = 0; i < s.cols; i++) tr.appendChild(createCell(s.cssClass));
                     });
-                    tr.appendChild(createCell('inventory-col'));
+                    
+                    // Affiche le stock restant de fermes 20M/25M
+                    const fermes20_25MCell = createCell('inventory-col');
+                    fermes20_25MCell.textContent = remainingFermes20_25M;
+                    tr.appendChild(fermes20_25MCell);
+
                     tr.appendChild(createCell(structureInventory['Domes'].cssClass));
                     
-                    // Vérification des week-ends avec la date d'affichage
                     if (displayDate.getDay() === 0 || displayDate.getDay() === 6) {
                         Array.from(tr.cells).forEach(c => c.classList.add('weekend'));
                     }
                     
-                    // Vérification des jours fériés avec le dateString UTC
                     if (holidays.has(dateString)) {
                         Array.from(tr.cells).forEach(c => c.classList.add('holiday'));
                     }
@@ -514,14 +547,19 @@
                 };
                 const manif = parseDateRange('dateManif'), montage = parseDateRange('dateMontage'), demontage = parseDateRange('dateDemontage');
                 if (!manif.start || !montage.start || !demontage.start) { alert("Veuillez sélectionner des dates pour toutes les périodes."); return; }
+                
+                const longueurValue = parseInt(document.getElementById('longueur').value, 10);
                 const data = {
                     id: Date.now(), contrat: document.getElementById('contrat').value, ville: document.getElementById('ville').value,
-                    structure: document.getElementById('structure').value, longueur: parseInt(document.getElementById('longueur').value, 10),
+                    structure: document.getElementById('structure').value, longueur: longueurValue,
                     hauteur: document.getElementById('hauteur').value, plancher: document.getElementById('plancher').value,
                     dateManifStart: manif.start, dateManifEnd: manif.end, dateMontageStart: montage.start, dateMontageEnd: montage.end,
                     dateDemontageStart: demontage.start, dateDemontageEnd: demontage.end,
                     delaiPrep: parseInt(document.getElementById('delaiPrep').value, 10),
+                    // MODIFICATION : On calcule et on stocke le nombre de fermes dans l'objet de réservation
+                    fermes: calculateFermes(longueurValue)
                 };
+
                 if (new Date(data.dateMontageStart) > new Date(data.dateManifStart) || new Date(data.dateManifEnd) > new Date(data.dateDemontageStart)) {
                     alert("Les dates ne sont pas cohérentes. (Ordre: Montage -> Manif -> Démontage)"); return;
                 }
@@ -591,6 +629,9 @@
             }
         });
     </script>
+
+</body>
+</html>
 
 </body>
 </html>
