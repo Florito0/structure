@@ -22,7 +22,6 @@
             --preparation-bg: #e9ecef;
         }
         
-        /* Assure un défilement normal pour toute la page */
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--background-color);
@@ -120,36 +119,20 @@
         .view-switcher button:first-child { border-radius: 6px 0 0 6px; }
         .view-switcher button:last-child { border-radius: 0 6px 6px 0; }
         
-        /* Conteneur planning avec barre de défilement horizontal toujours visible */
         .planning-container {
             position: relative; 
-            overflow-x: scroll; /* Force la barre de défilement horizontale à être toujours visible */
-            overflow-y: auto; /* Garde le défilement vertical normal */
+            overflow-x: scroll;
+            overflow-y: auto;
             background-color: var(--surface-color);
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            /* Assure que la barre de défilement horizontale est visible */
             scrollbar-gutter: stable;
         }
 
-        /* Force l'affichage de la barre de défilement horizontale sur tous les navigateurs */
-        .planning-container::-webkit-scrollbar {
-            height: 12px;
-        }
-
-        .planning-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 6px;
-        }
-
-        .planning-container::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 6px;
-        }
-
-        .planning-container::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
-        }
+        .planning-container::-webkit-scrollbar { height: 12px; }
+        .planning-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 6px; }
+        .planning-container::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 6px; }
+        .planning-container::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
 
         table.planning-grid {
             width: 100%;
@@ -194,18 +177,10 @@
         .col-group-20m { background-color: #f7fee7; }
         .col-group-25m { background-color: #faf5ff; }
 
-        .planning-grid .weekend {
-            box-shadow: inset 0 0 0 2000px rgba(0, 0, 0, 0.05);
-        }
-        .planning-grid .holiday {
-            box-shadow: inset 0 0 0 2000px rgba(180, 83, 9, 0.1);
-        }
-        .planning-grid .weekend.holiday {
-            box-shadow: inset 0 0 0 2000px rgba(180, 83, 9, 0.15);
-        }
-        .planning-grid tbody tr:hover td {
-            box-shadow: inset 0 0 0 2000px rgba(0, 0, 0, 0.08);
-        }
+        .planning-grid .weekend { box-shadow: inset 0 0 0 2000px rgba(0, 0, 0, 0.05); }
+        .planning-grid .holiday { box-shadow: inset 0 0 0 2000px rgba(180, 83, 9, 0.1); }
+        .planning-grid .weekend.holiday { box-shadow: inset 0 0 0 2000px rgba(180, 83, 9, 0.15); }
+        .planning-grid tbody tr:hover td { box-shadow: inset 0 0 0 2000px rgba(0, 0, 0, 0.08); }
 
         /* --- EVENTS --- */
         .event-block {
@@ -234,80 +209,30 @@
     <div class="controls-container">
         <h1>Ajouter une Réservation</h1>
         <form id="reservationForm" class="form-grid">
+            <div class="form-field"> <label for="contrat">Contrat N°</label> <input type="text" id="contrat" placeholder="ex: DLR42665" required> </div>
+            <div class="form-field"> <label for="ville">Ville</label> <input type="text" id="ville" placeholder="ex: Paris" required> </div>
             <div class="form-field">
-                <label for="contrat">Contrat N°</label>
-                <input type="text" id="contrat" placeholder="ex: DLR42665" required>
-            </div>
-            <div class="form-field">
-                <label for="ville">Ville</label>
-                <input type="text" id="ville" placeholder="ex: Paris" required>
-            </div>
-             <div class="form-field">
                 <label for="structure">Structure</label>
                 <select id="structure" required>
-                    <option value="15M">15M</option>
-                    <option value="20M">20M</option>
-                    <option value="25M">25M</option>
-                    <option value="10M_H5">10M H5</option>
-                    <option value="10M_H4">10M H4</option>
-                    <option value="12M">12M</option>
+                    <option value="15M">15M</option> <option value="20M">20M</option> <option value="25M">25M</option>
+                    <option value="10M_H5">10M H5</option> <option value="10M_H4">10M H4</option> <option value="12M">12M</option>
                 </select>
             </div>
-            <div class="form-field">
-                <label for="longueur">Longueur (m)</label>
-                <select id="longueur" required></select>
-            </div>
-            <div class="form-field">
-                <label for="hauteur">Hauteur</label>
-                <select id="hauteur" required>
-                    <option value="H3">H3</option>
-                    <option value="H4">H4</option>
-                </select>
-            </div>
-             <div class="form-field">
-                <label for="plancher">Plancher</label>
-                <select id="plancher" required>
-                    <option value="AP">AP (Avec Plancher)</option>
-                    <option value="SP">SP (Sans Plancher)</option>
-                </select>
-            </div>
-            <div class="form-field">
-                <label for="dateManif">Date(s) Manifestation</label>
-                <input type="text" id="dateManif" placeholder="Sélectionner une plage de dates" required>
-            </div>
-            <div class="form-field">
-                <label for="dateMontage">Date(s) Montage</label>
-                <input type="text" id="dateMontage" placeholder="Sélectionner une plage de dates" required>
-            </div>
-            <div class="form-field">
-                <label for="dateDemontage">Date(s) Démontage</label>
-                <input type="text" id="dateDemontage" placeholder="Sélectionner une plage de dates" required>
-            </div>
-            <div class="form-field">
-                <label for="delaiPrep">Délai Préparation (jours)</label>
-                <input type="number" id="delaiPrep" value="4" min="0" required>
-            </div>
-            <div class="form-field">
-                <label for="dispo">Demande de dispo</label>
-                <select id="dispo" required>
-                    <option value="Non" selected>Non</option>
-                    <option value="Oui">Oui</option>
-                </select>
-            </div>
-            <div class="form-actions">
-                <button type="submit">Ajouter au Planning</button>
-            </div>
+            <div class="form-field"> <label for="longueur">Longueur (m)</label> <select id="longueur" required></select> </div>
+            <div class="form-field"> <label for="hauteur">Hauteur</label> <select id="hauteur" required> <option value="H3">H3</option> <option value="H4">H4</option> </select> </div>
+            <div class="form-field"> <label for="plancher">Plancher</label> <select id="plancher" required> <option value="AP">AP (Avec Plancher)</option> <option value="SP">SP (Sans Plancher)</option> </select> </div>
+            <div class="form-field"> <label for="dateManif">Date(s) Manifestation</label> <input type="text" id="dateManif" placeholder="Sélectionner une plage de dates" required> </div>
+            <div class="form-field"> <label for="dateMontage">Date(s) Montage</label> <input type="text" id="dateMontage" placeholder="Sélectionner une plage de dates" required> </div>
+            <div class="form-field"> <label for="dateDemontage">Date(s) Démontage</label> <input type="text" id="dateDemontage" placeholder="Sélectionner une plage de dates" required> </div>
+            <div class="form-field"> <label for="delaiPrep">Délai Préparation (jours)</label> <input type="number" id="delaiPrep" value="4" min="0" required> </div>
+            <div class="form-field"> <label for="dispo">Demande de dispo</label> <select id="dispo" required> <option value="Non" selected>Non</option> <option value="Oui">Oui</option> </select> </div>
+            <div class="form-actions"> <button type="submit">Ajouter au Planning</button> </div>
         </form>
     </div>
 
     <div class="planning-controls">
-        <div class="nav-controls">
-            <h2 id="currentMonthYear"></h2>
-        </div>
-        <div class="view-switcher">
-            <button id="dayViewBtn">Jour</button>
-            <button id="weekViewBtn" class="active">Semaine</button>
-        </div>
+        <div class="nav-controls"> <h2 id="currentMonthYear"></h2> </div>
+        <div class="view-switcher"> <button id="dayViewBtn">Jour</button> <button id="weekViewBtn" class="active">Semaine</button> </div>
     </div>
     
     <div class="planning-container" id="planningContainer">
@@ -316,14 +241,15 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // NOUVEAU : Ajout du stock de 89 fermes pour les Domes.
             const structureInventory = {
                 "10M_H5": { name: "10*10 Arquée H5", cols: 1, startCol: 1, cssClass: 'col-group-small' },
                 "10M_H4": { name: "10*50 Arquée H4", cols: 1, startCol: 2, cssClass: 'col-group-small' },
                 "12M":    { name: "12*25 Arquée H3", cols: 1, startCol: 3, cssClass: 'col-group-small' },
                 "15M":    { name: "15M Arquée",      cols: 8, startCol: 4, cssClass: 'col-group-15m', sub: ["H3", "H3", "H3", "H3", "H3", "H3", "H3/H4", "H3/H4"], fermes: 51 },
-                "20M":    { name: "20M Arquée",      cols: 7, startCol: 13, cssClass: 'col-group-20m', sub: ["H3", "H3", "H3", "H3", "H3/H4", "H3/H4", "H3/H4"], fermes: 54 },
-                "25M":    { name: "25M Arquée",      cols: 3, startCol: 20, cssClass: 'col-group-25m', sub: ["H3", "H3", "H3"], fermes: 54 },
-                "Domes":  { name: "Domes",           cols: 1, startCol: 24, cssClass: '' },
+                "20M":    { name: "20M Arquée",      cols: 7, startCol: 14, cssClass: 'col-group-20m', sub: ["H3", "H3", "H3", "H3", "H3/H4", "H3/H4", "H3/H4"], fermes: 54 },
+                "25M":    { name: "25M Arquée",      cols: 3, startCol: 21, cssClass: 'col-group-25m', sub: ["H3", "H3", "H3"], fermes: 54 },
+                "Domes":  { name: "Domes",           cols: 1, startCol: 25, cssClass: 'inventory-col', fermes: 89 },
             };
 
             let reservations = [];
@@ -345,11 +271,8 @@
 
             function initializeDatePickers() {
                 const config = {
-                    mode: "range", 
-                    dateFormat: "d/m/Y", 
-                    locale: flatpickr.l10ns.fr, // Utilisation correcte de la locale française
-                    minDate: "01/01/2026", 
-                    maxDate: "31/12/2026"
+                    mode: "range", dateFormat: "d/m/Y", locale: flatpickr.l10ns.fr,
+                    minDate: "01/01/2026", maxDate: "31/12/2026"
                 };
                 flatpickr("#dateManif", config);
                 flatpickr("#dateMontage", config);
@@ -365,18 +288,10 @@
 
             function getFrenchPublicHolidays() {
                 const holidays = new Set();
-                // Utilisation d'UTC pour éviter les problèmes de fuseau horaire
-                holidays.add('2026-01-01'); // Jour de l'An - Mercredi
-                holidays.add('2026-04-06'); // Lundi de Pâques
-                holidays.add('2026-05-01'); // Fête du Travail - Vendredi
-                holidays.add('2026-05-08'); // Fête de la Victoire - Vendredi
-                holidays.add('2026-05-14'); // Ascension - Jeudi
-                holidays.add('2026-05-25'); // Lundi de Pentecôte
-                holidays.add('2026-07-14'); // Fête Nationale - Mardi
-                holidays.add('2026-08-15'); // Assomption - Samedi
-                holidays.add('2026-11-01'); // Toussaint - Dimanche
-                holidays.add('2026-11-11'); // Armistice - Mercredi
-                holidays.add('2026-12-25'); // Noël - Vendredi
+                holidays.add('2026-01-01'); holidays.add('2026-04-06'); holidays.add('2026-05-01');
+                holidays.add('2026-05-08'); holidays.add('2026-05-14'); holidays.add('2026-05-25');
+                holidays.add('2026-07-14'); holidays.add('2026-08-15'); holidays.add('2026-11-01');
+                holidays.add('2026-11-11'); holidays.add('2026-12-25');
                 return holidays;
             }
 
@@ -387,12 +302,8 @@
                 }
             }
 
-            // MODIFICATION : Ajout de la fonction de calcul des fermes
             function calculateFermes(longueur) {
-                if (longueur === 0) {
-                    return 0;
-                }
-                // La formule est (longueur / 5) + 1
+                if (longueur === 0) { return 0; }
                 return (longueur / 5) + 1;
             }
             
@@ -430,34 +341,40 @@
                     mainHeaderRow.appendChild(createTh(s.name, s.cols, `main-header ${s.cssClass}`));
                     subHeaderRow.appendChild(createTh('', 1, `sub-header ${s.cssClass}`));
                 });
+
                 const s15 = structureInventory['15M'];
                 mainHeaderRow.appendChild(createTh(s15.name, s15.cols, `main-header ${s15.cssClass}`));
                 s15.sub.forEach(sub => subHeaderRow.appendChild(createTh(sub, 1, `sub-header ${s15.cssClass}`)));
-                mainHeaderRow.appendChild(createTh('Fermes', 1, 'main-header')); subHeaderRow.appendChild(createTh(s15.fermes, 1, 'sub-header')); // Affiche le stock total
+                mainHeaderRow.appendChild(createTh('Fermes', 1, 'main-header')); 
+                subHeaderRow.appendChild(createTh(s15.fermes, 1, 'sub-header'));
 
-                mainHeaderRow.appendChild(createTh(currentView === 'week' ? 'Semaine' : 'Date', 1, 'main-header')); subHeaderRow.appendChild(createTh('', 1, 'sub-header'));
+                mainHeaderRow.appendChild(createTh(currentView === 'week' ? 'Semaine' : 'Date', 1, 'main-header')); 
+                subHeaderRow.appendChild(createTh('', 1, 'sub-header'));
 
                 ['20M', '25M'].forEach(key => {
                      const s = structureInventory[key];
                     mainHeaderRow.appendChild(createTh(s.name, s.cols, `main-header ${s.cssClass}`));
                     s.sub.forEach(sub => subHeaderRow.appendChild(createTh(sub, 1, `sub-header ${s.cssClass}`)));
                 });
-                mainHeaderRow.appendChild(createTh('Fermes', 1, 'main-header')); subHeaderRow.appendChild(createTh(structureInventory['20M'].fermes, 1, 'sub-header')); // Affiche le stock total
+                mainHeaderRow.appendChild(createTh('Fermes', 1, 'main-header')); 
+                subHeaderRow.appendChild(createTh(structureInventory['20M'].fermes, 1, 'sub-header'));
                 
                 const sDomes = structureInventory['Domes'];
                 mainHeaderRow.appendChild(createTh(sDomes.name, sDomes.cols, `main-header ${sDomes.cssClass}`));
-                subHeaderRow.appendChild(createTh(sDomes.count, 1, `sub-header ${sDomes.cssClass}`));
+                // NOUVEAU : Affichage du stock total de Domes dans l'en-tête.
+                subHeaderRow.appendChild(createTh(sDomes.fermes, 1, `sub-header ${sDomes.cssClass}`));
 
                 thead.appendChild(mainHeaderRow); thead.appendChild(subHeaderRow);
                 planningGrid.appendChild(thead);
             }
             
-            // MODIFICATION : La fonction generateGridBody est entièrement mise à jour pour calculer le stock restant
             function generateGridBody(dates) {
                 const tbody = document.createElement('tbody');
                 const holidays = getFrenchPublicHolidays();
                 const totalFermes15M = structureInventory['15M'].fermes;
-                const totalFermes20_25M = structureInventory['20M'].fermes; // 20M et 25M partagent le même stock
+                const totalFermes20_25M = structureInventory['20M'].fermes;
+                // NOUVEAU : On récupère le stock total de Domes.
+                const totalDomes = structureInventory['Domes'].fermes;
 
                 dates.forEach(date => {
                     const tr = document.createElement('tr');
@@ -465,15 +382,23 @@
                     const dateString = localDate.toISOString().slice(0, 10);
                     tr.dataset.date = dateString;
                     
-                    // Calcul du stock de fermes restant pour cette date
                     let remainingFermes15M = totalFermes15M;
                     let remainingFermes20_25M = totalFermes20_25M;
+                    // NOUVEAU : On initialise le stock restant de Domes.
+                    let remainingDomes = totalDomes;
+                    
                     reservations.forEach(res => {
                         if (dateString >= res.overallStartDate && dateString <= res.overallEndDate) {
+                            // Calcul spécifique pour les colonnes "Fermes"
                             if (res.structure === '15M') {
                                 remainingFermes15M -= res.fermes;
                             } else if (res.structure === '20M' || res.structure === '25M') {
                                 remainingFermes20_25M -= res.fermes;
+                            }
+                            
+                            // NOUVEAU : Calcul global pour la colonne "Domes"
+                            if (res.fermes && res.fermes > 0) {
+                                remainingDomes -= res.fermes;
                             }
                         }
                     });
@@ -494,8 +419,7 @@
                         const s = structureInventory[key];
                         for(let i = 0; i < s.cols; i++) tr.appendChild(createCell(s.cssClass));
                     });
-
-                    // Affiche le stock restant de fermes 15M
+                    
                     const fermes15MCell = createCell('inventory-col');
                     fermes15MCell.textContent = remainingFermes15M;
                     tr.appendChild(fermes15MCell);
@@ -507,12 +431,14 @@
                         for(let i = 0; i < s.cols; i++) tr.appendChild(createCell(s.cssClass));
                     });
                     
-                    // Affiche le stock restant de fermes 20M/25M
                     const fermes20_25MCell = createCell('inventory-col');
                     fermes20_25MCell.textContent = remainingFermes20_25M;
                     tr.appendChild(fermes20_25MCell);
 
-                    tr.appendChild(createCell(structureInventory['Domes'].cssClass));
+                    // NOUVEAU : Affichage du stock restant de Domes dans sa cellule.
+                    const domesCell = createCell(structureInventory['Domes'].cssClass);
+                    domesCell.textContent = remainingDomes;
+                    tr.appendChild(domesCell);
                     
                     if (displayDate.getDay() === 0 || displayDate.getDay() === 6) {
                         Array.from(tr.cells).forEach(c => c.classList.add('weekend'));
@@ -556,7 +482,6 @@
                     dateManifStart: manif.start, dateManifEnd: manif.end, dateMontageStart: montage.start, dateMontageEnd: montage.end,
                     dateDemontageStart: demontage.start, dateDemontageEnd: demontage.end,
                     delaiPrep: parseInt(document.getElementById('delaiPrep').value, 10),
-                    // MODIFICATION : On calcule et on stocke le nombre de fermes dans l'objet de réservation
                     fermes: calculateFermes(longueurValue)
                 };
 
