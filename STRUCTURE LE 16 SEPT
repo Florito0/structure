@@ -150,18 +150,46 @@
         
         .planning-container {
             position: relative; 
-            overflow-x: scroll;
+            overflow-x: auto;
             overflow-y: auto;
             background-color: var(--surface-color);
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             scrollbar-gutter: stable;
+            max-height: 80vh; /* Limiter la hauteur pour forcer le scroll vertical si nécessaire */
         }
 
-        .planning-container::-webkit-scrollbar { height: 12px; }
-        .planning-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 6px; }
-        .planning-container::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 6px; }
-        .planning-container::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+        /* Barre de défilement horizontale personnalisée */
+        .planning-container::-webkit-scrollbar { 
+            height: 14px; /* Barre horizontale */
+            width: 14px;  /* Barre verticale */
+        }
+        
+        .planning-container::-webkit-scrollbar-track { 
+            background: #f1f1f1; 
+            border-radius: 8px;
+            margin: 2px;
+        }
+        
+        .planning-container::-webkit-scrollbar-thumb { 
+            background: linear-gradient(45deg, #c1c1c1, #a8a8a8);
+            border-radius: 8px;
+            border: 2px solid #f1f1f1;
+        }
+        
+        .planning-container::-webkit-scrollbar-thumb:hover { 
+            background: linear-gradient(45deg, #a8a8a8, #909090);
+        }
+        
+        .planning-container::-webkit-scrollbar-corner {
+            background: #f1f1f1;
+        }
+
+        /* Assurer que la barre horizontale est toujours visible */
+        .planning-container {
+            scrollbar-width: auto; /* Pour Firefox */
+            scrollbar-color: #c1c1c1 #f1f1f1; /* Pour Firefox */
+        }
 
         table.planning-grid {
             width: 100%;
