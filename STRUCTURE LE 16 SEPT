@@ -212,6 +212,7 @@
             z-index: 10;
         }
         
+        .planning-grid th.main-header { background-color: #e2e2e2; top: 0; }
         .planning-grid th.sub-header { background-color: #f2f2f2; top: 41px; }
 
         .planning-grid .date-col {
@@ -226,6 +227,12 @@
         .inventory-col {
             font-weight: bold;
             background-color: #e6f7ff !important;
+        }
+
+        .inventory-col.domes-header {
+            background-color: #fef2f2 !important;
+            color: #991b1b;
+            border-left: 3px solid #f87171;
         }
 
         .col-group-small { background-color: #fafafa; }
@@ -528,8 +535,8 @@
                 subHeaderRow.appendChild(createTh('', 1, 'sub-header'));
                 
                 const sDomes = structureInventory['Domes'];
-                mainHeaderRow.appendChild(createTh(sDomes.name, sDomes.cols, `main-header ${sDomes.cssClass}`));
-                subHeaderRow.appendChild(createTh(sDomes.fermes, 1, `sub-header ${sDomes.cssClass}`));
+                mainHeaderRow.appendChild(createTh(sDomes.name, sDomes.cols, `main-header ${sDomes.cssClass} domes-header`));
+                subHeaderRow.appendChild(createTh(sDomes.fermes, 1, `sub-header ${sDomes.cssClass} domes-header`));
 
                 thead.appendChild(mainHeaderRow); thead.appendChild(subHeaderRow);
                 planningGrid.appendChild(thead);
@@ -667,7 +674,7 @@
                     }
                     tr.appendChild(demandesDispo20_25MCell);
 
-                    const domesCell = createCell(structureInventory['Domes'].cssClass);
+                    const domesCell = createCell(`${structureInventory['Domes'].cssClass} domes-header`);
                     domesCell.textContent = remainingDomes;
                     tr.appendChild(domesCell);
                     
