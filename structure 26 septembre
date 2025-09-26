@@ -1242,12 +1242,17 @@
                     const prepHeightPercent = (prepDurationDays / totalDurationDays) * 100;
                     const montageTopPercent = prepHeightPercent;
                     const manifTopPercent = montageTopPercent + (montageDurationDays / totalDurationDays) * 100;
-                    const demontageTopPercent = manifTopPercent + (manifDurationDays / totalDurationDays) * 100;
+                    let demontageTopPercent = manifTopPercent + (manifDurationDays / totalDurationDays) * 100;
                     // === CORRECTION DE LA POSITION DES INFOS ===
                     // On calcule la position centrale de la période de manifestation
-                    const manifCenterTopPercent = manifTopPercent + ((demontageTopPercent - manifTopPercent) / 2);
+                    let manifCenterTopPercent = manifTopPercent + ((demontageTopPercent - manifTopPercent) / 2);
                     const montageDateRange = formatRangeForMarker(res.dateMontageStart, res.dateMontageEnd);
                     const demontageDateRange = formatRangeForMarker(res.dateDemontageStart, res.dateDemontageEnd);
+                    // Ajustement spécifique pour la vue semaine pour éviter le chevauchement
+                    if (currentView === 'week') {
+                        demontageTopPercent += 5; // Décalage de 5% vers le bas pour la vue semaine
+                        manifCenterTopPercent -= 2.5; // Décalage de 2.5% vers le haut pour l'info
+                    }
                     block.innerHTML = `
                         <div class="event-block-content prep-part" style="height: ${prepHeightPercent}%;">
                             <span>Préparation</span>
