@@ -528,7 +528,7 @@
         .planning-container.view-week .planning-grid th.sub-header.col-group-15m,
         .planning-container.view-week .planning-grid th.sub-header.col-group-20m,
         .planning-container.view-week .planning-grid th.sub-header.col-group-25m {
-            height: 45px !important;
+            height: 0px !important;
         }
     </style>
 </head>
