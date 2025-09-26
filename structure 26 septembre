@@ -522,12 +522,12 @@
             font-size: 1.2em;
             margin-right: 0.5rem;
         }
-        /* Règle spécifique pour les en-têtes en vue semaine avec même hauteur que vue jour */
-        .planning-container.view-week .planning-grid th.main-header,
-        .planning-container.view-week .planning-grid th.sub-header.col-group-small,
-        .planning-container.view-week .planning-grid th.sub-header.col-group-15m,
-        .planning-container.view-week .planning-grid th.sub-header.col-group-20m,
-        .planning-container.view-week .planning-grid th.sub-header.col-group-25m {
+        /* Règle spécifique pour les sub-headers en vue semaine */
+        .planning-container.view-week .planning-grid th.sub-header {
+            height: 0px !important;
+        }
+        /* Règle spécifique pour les main-headers en vue semaine */
+        .planning-container.view-week .planning-grid th.main-header {
             height: 0px !important;
         }
     </style>
