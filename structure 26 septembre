@@ -208,7 +208,7 @@
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
-            min-width: 3300px;
+            min-width: 3400px;
         }
         .planning-grid th, .planning-grid td {
             border: 1px solid var(--border-color);
@@ -292,6 +292,7 @@
         .col-group-15m { background-color: #f0f9ff; }
         .col-group-20m { background-color: #f7fee7; }
         .col-group-25m { background-color: #faf5ff; }
+        .col-group-25x65h4 { background-color: #f3e8ff; }
         .planning-grid .weekend { 
             box-shadow: inset 0 0 0 2000px rgba(0, 0, 0, 0.05); 
         }
@@ -556,6 +557,7 @@
                     <option value="10M_H5">10M H5</option>
                     <option value="10M_H4">10M H4</option>
                     <option value="12M">12M</option>
+                    <option value="25x65H4">25*65 H4 ou 30*65 H4</option>
                 </select>
             </div>
             <div class="form-field">
@@ -648,7 +650,8 @@
                 "15M":    { name: "15M Arquée",       cols: 8, startCol: 4, cssClass: 'col-group-15m', sub: ["H3", "H3", "H3", "H3", "H3", "H3", "H3/H4", "H3/H4"], fermes: 51 },
                 "20M":    { name: "20M Arquée",       cols: 7, startCol: 16, cssClass: 'col-group-20m', sub: ["H3", "H3", "H3", "H3", "H3/H4", "H3/H4", "H3/H4"], fermes: 54 },
                 "25M":    { name: "25M Arquée",       cols: 3, startCol: 23, cssClass: 'col-group-25m', sub: ["H3", "H3", "H3"], fermes: 54 },
-                "Domes":  { name: "Domes",             cols: 1, startCol: 28, cssClass: 'inventory-col', fermes: 89 }
+                "Domes":  { name: "Domes",             cols: 1, startCol: 28, cssClass: 'inventory-col', fermes: 89 },
+                "25x65H4": { name: "25*65 H4 ou 30*65 H4", cols: 1, startCol: 31, cssClass: 'col-group-25x65h4', sub: ["H4"], fermes: 14 }
             };
             
             let dynamicDispoColumns = {
@@ -754,7 +757,7 @@
                 for (let i = 0; i < s.cols; i++) {
                     const colIndex = s.startCol + i;
                     
-                    if (sType === '15M' || sType === '20M') {
+                    if (sType === '15M' || sType === '20M' || sType === '25x65H4') {
                         const subHeader = s.sub[i];
                         if (hauteur === 'H4' && subHeader === 'H3') {
                             continue;
@@ -980,6 +983,13 @@
                 subHeaderRow.appendChild(createTh(sDomes.fermes, 1, `sub-header ${sDomes.cssClass} domes-header sticky-col-right domes-main-col`));
                 mainHeaderRow.appendChild(createTh('Domes virtuel', 1, `main-header inventory-col domes-header sticky-col-right domes-virtuel-col`));
                 subHeaderRow.appendChild(createTh('', 1, `sub-header inventory-col domes-header sticky-col-right domes-virtuel-col`));
+
+                const s25x65H4 = structureInventory['25x65H4'];
+                mainHeaderRow.appendChild(createTh(s25x65H4.name, s25x65H4.cols, `main-header ${s25x65H4.cssClass}`));
+                s25x65H4.sub.forEach(sub => subHeaderRow.appendChild(createTh(sub, 1, `sub-header ${s25x65H4.cssClass}`)));
+                mainHeaderRow.appendChild(createTh('Fermes', 1, 'main-header')); 
+                subHeaderRow.appendChild(createTh(s25x65H4.fermes, 1, 'sub-header'));
+                
                 thead.appendChild(mainHeaderRow); 
                 thead.appendChild(subHeaderRow);
                 planningGrid.appendChild(thead);
@@ -990,6 +1000,7 @@
                 const totalFermes15M = structureInventory['15M'].fermes;
                 const totalFermes20_25M = structureInventory['20M'].fermes;
                 const totalDomes = structureInventory['Domes'].fermes;
+                const totalFermes25x65H4 = structureInventory['25x65H4'].fermes;
                 dates.forEach(date => {
                     const tr = document.createElement('tr');
                     const localDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
@@ -999,6 +1010,7 @@
                     let remainingFermes15M = totalFermes15M;
                     let remainingFermes20_25M = totalFermes20_25M;
                     let remainingDomes = totalDomes;
+                    let remainingFermes25x65H4 = totalFermes25x65H4;
                     let domesDemandesEnDispo = 0;
                     let demandesDispoFermes15M = 0;
                     let demandesDispoFermes20_25M = 0;
@@ -1014,6 +1026,7 @@
                             if (res.dispo !== 'Oui') {
                                 if (res.structure === '15M') remainingFermes15M -= res.fermes;
                                 else if (res.structure === '20M' || res.structure === '25M') remainingFermes20_25M -= res.fermes;
+                                else if (res.structure === '25x65H4') remainingFermes25x65H4 -= res.fermes;
                             } else {
                                 const groupKey = res.structure === '15M' ? '15M' : '20M_25M';
                                 const dispoIndex = dynamicDispoColumns[groupKey].findIndex(d => d.id === res.id);
@@ -1031,7 +1044,7 @@
                                     }
                                 }
                             }
-                            if (res.fermes && res.fermes > 0) {
+                            if (res.fermes && res.fermes > 0 && res.structure !== '25x65H4') {
                                 if (res.dispo === 'Oui') domesDemandesEnDispo += res.fermes;
                                 else remainingDomes -= res.fermes;
                             }
@@ -1111,6 +1124,11 @@
                     domesVirtuelCell.textContent = domesVirtuelTotal;
                     if (domesVirtuelTotal < 0) domesVirtuelCell.style.cssText = 'color: #dc3545; font-weight: bold;';
                     tr.appendChild(domesVirtuelCell);
+
+                    const s25x65H4 = structureInventory['25x65H4'];
+                    for(let i = 0; i < s25x65H4.cols; i++) tr.appendChild(createCell(s25x65H4.cssClass));
+                    tr.appendChild(createCell('inventory-col')).textContent = remainingFermes25x65H4;
+                    
                     if (displayDate.getDay() === 0 || displayDate.getDay() === 6) {
                         Array.from(tr.cells).forEach(c => c.classList.add('weekend'));
                     }
@@ -1140,15 +1158,25 @@
             
             function renderReservations() {
                 document.querySelectorAll('.event-block').forEach(el => el.remove());
+                // Calcul des extras pour les positions physiques
+                const extra15 = Math.max(0, dynamicDispoColumns['15M'].length - 1);
+                const extra20 = Math.max(0, dynamicDispoColumns['20M_25M'].length - 1);
                 // Créer un bloc unifié pour les réservations confirmées
                 reservations.filter(res => res.dispo !== 'Oui').forEach(res => {
+                    let extra = 0;
+                    if (['20M', '25M'].includes(res.structure)) {
+                        extra = extra15;
+                    } else if (res.structure === '25x65H4') {
+                        extra = extra15 + extra20;
+                    }
+                    const physicalColumn = res.columnIndex + extra;
                     createEventBlock({
                         res: res,
                         type: 'unified',
                         startDate: new Date(res.overallStartDate),
                         // On ajoute 1 jour à la fin pour que le bloc couvre bien le dernier jour
                         endDate: new Date(new Date(res.overallEndDate).getTime() + 86400000), 
-                        column: res.columnIndex
+                        column: physicalColumn
                     });
                 });
                 // Gérer les demandes de dispo
@@ -1337,11 +1365,12 @@
                 }
                 
                 const longueurValue = parseInt(document.getElementById('longueur').value, 10);
+                const structureValue = document.getElementById('structure').value;
                 const data = {
                     id: editingReservationId || Date.now(), 
                     contrat: document.getElementById('contrat').value, 
                     ville: document.getElementById('ville').value,
-                    structure: document.getElementById('structure').value, 
+                    structure: structureValue, 
                     longueur: longueurValue,
                     hauteur: document.getElementById('hauteur').value, 
                     plancher: document.getElementById('plancher').value,
@@ -1352,7 +1381,7 @@
                     dateDemontageStart: demontage.start, 
                     dateDemontageEnd: demontage.end,
                     delaiPrep: parseInt(document.getElementById('delaiPrep').value, 10),
-                    fermes: calculateFermes(longueurValue),
+                    fermes: structureValue === '25x65H4' ? 14 : calculateFermes(longueurValue),
                     dispo: document.getElementById('dispo').value
                 };
                 if (new Date(data.dateMontageStart) > new Date(data.dateManifStart) || new Date(data.dateManifEnd) > new Date(data.dateDemontageStart)) {
