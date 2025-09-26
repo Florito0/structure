@@ -557,7 +557,14 @@
                     <option value="10M_H5">10M H5</option>
                     <option value="10M_H4">10M H4</option>
                     <option value="12M">12M</option>
-                    <option value="25x65H4">25*65 H4 ou 30*65 H4</option>
+                    <option value="25x65H4" title="Sélectionnez la largeur dans le champ ci-dessous">25*65 H4 ou 30*65 H4</option>
+                </select>
+            </div>
+            <div class="form-field" id="largeurField" style="display: none;">
+                <label for="largeurSelect">Largeur (m)</label>
+                <select id="largeurSelect">
+                    <option value="25">25m</option>
+                    <option value="30">30m</option>
                 </select>
             </div>
             <div class="form-field">
@@ -670,7 +677,10 @@
             const planningGrid = document.getElementById('planningGrid');
             const currentMonthYearEl = document.getElementById('currentMonthYear');
             const form = document.getElementById('reservationForm');
+            const structureSelect = document.getElementById('structure');
             const longueurSelect = document.getElementById('longueur');
+            const largeurField = document.getElementById('largeurField');
+            const largeurSelect = document.getElementById('largeurSelect');
             const editModeIndicator = document.getElementById('editModeIndicator');
             const cancelEditBtn = document.getElementById('cancelEditBtn');
             const deleteBtn = document.getElementById('deleteBtn');
@@ -699,6 +709,23 @@
                     opt.value = i; 
                     opt.textContent = i + 'm'; 
                     longueurSelect.appendChild(opt);
+                }
+            }
+            function handleStructureChange() {
+                if (structureSelect.value === '25x65H4') {
+                    largeurField.style.display = 'block';
+                    longueurSelect.innerHTML = '';
+                    for (let i = 0; i <= 65; i += 5) {
+                        const opt = document.createElement('option');
+                        opt.value = i;
+                        opt.textContent = i + 'm';
+                        longueurSelect.appendChild(opt);
+                    }
+                    longueurSelect.disabled = false;
+                } else {
+                    populateLongueurOptions();
+                    largeurField.style.display = 'none';
+                    longueurSelect.disabled = false;
                 }
             }
             function calculateFermes(longueur) {
@@ -803,6 +830,7 @@
                 editingReservationId = null;
                 form.reset();
                 populateLongueurOptions();
+                handleStructureChange();
                 
                 editModeIndicator.style.display = 'none';
                 cancelEditBtn.style.display = 'none';
@@ -1248,6 +1276,8 @@
                     editReservation(parseInt(res.id));
                 });
                 
+                const structureInfo = res.structure === '25x65H4' ? `${res.largeur}*${res.longueur} H4` : `${res.structure.replace('_', ' ')} ${res.longueur}m`;
+                
                 if (type === 'unified') {
                     block.classList.add('unified-period');
                     const oneDay = 24 * 60 * 60 * 1000;
@@ -1290,7 +1320,7 @@
                         <div class="event-info-wrapper" style="top: ${manifCenterTopPercent}%;">
                            <span class="event-line event-contrat">${res.contrat}</span>
                            <span class="event-line event-ville">${res.ville}</span>
-                           <span class="event-line" style="font-size: 0.9em;">${res.structure.replace('_', ' ')} ${res.longueur}m ${res.plancher}</span>
+                           <span class="event-line" style="font-size: 0.9em;">${structureInfo} ${res.plancher}</span>
                         </div>
                         <div class="event-marker montage-marker" style="top: ${montageTopPercent}%;">
                             M <span class="marker-date">${montageDateRange}</span>
@@ -1303,7 +1333,7 @@
                     block.classList.add('dispo-period');
                     block.innerHTML = `
                         <span class="event-line event-contrat">${res.contrat}</span>
-                        <span class="event-line">${res.structure.replace('_', ' ')} ${res.longueur}m ${res.plancher}</span>
+                        <span class="event-line">${structureInfo} ${res.plancher}</span>
                     `;
                 }
                 
@@ -1316,12 +1346,22 @@
                 
                 document.getElementById('contrat').value = reservation.contrat;
                 document.getElementById('ville').value = reservation.ville;
-                document.getElementById('structure').value = reservation.structure;
-                document.getElementById('longueur').value = reservation.longueur;
                 document.getElementById('hauteur').value = reservation.hauteur;
                 document.getElementById('plancher').value = reservation.plancher;
                 document.getElementById('delaiPrep').value = reservation.delaiPrep;
                 document.getElementById('dispo').value = reservation.dispo || 'Non';
+                
+                document.getElementById('structure').value = reservation.structure;
+                handleStructureChange();
+                
+                if (reservation.structure === '25x65H4') {
+                    document.getElementById('longueur').value = reservation.longueur;
+                    document.getElementById('largeurSelect').value = reservation.largeur || '25';
+                    largeurField.style.display = 'block';
+                } else {
+                    document.getElementById('longueur').value = reservation.longueur;
+                    largeurField.style.display = 'none';
+                }
                 
                 const manifRange = `${reservation.dateManifStart.split('-').reverse().join('/')} au ${reservation.dateManifEnd.split('-').reverse().join('/')}`;
                 const montageRange = `${reservation.dateMontageStart.split('-').reverse().join('/')} au ${reservation.dateMontageEnd.split('-').reverse().join('/')}`;
@@ -1372,6 +1412,7 @@
                     ville: document.getElementById('ville').value,
                     structure: structureValue, 
                     longueur: longueurValue,
+                    largeur: structureValue === '25x65H4' ? document.getElementById('largeurSelect').value : null,
                     hauteur: document.getElementById('hauteur').value, 
                     plancher: document.getElementById('plancher').value,
                     dateManifStart: manif.start, 
@@ -1381,7 +1422,7 @@
                     dateDemontageStart: demontage.start, 
                     dateDemontageEnd: demontage.end,
                     delaiPrep: parseInt(document.getElementById('delaiPrep').value, 10),
-                    fermes: structureValue === '25x65H4' ? 14 : calculateFermes(longueurValue),
+                    fermes: structureValue === '25x65H4' ? (longueurValue / 5) : calculateFermes(longueurValue),
                     dispo: document.getElementById('dispo').value
                 };
                 if (new Date(data.dateMontageStart) > new Date(data.dateManifStart) || new Date(data.dateManifEnd) > new Date(data.dateDemontageStart)) {
@@ -1433,6 +1474,7 @@
                     }
                     form.reset();
                     populateLongueurOptions();
+                    handleStructureChange();
                     initializeDatePickers(); 
                 }
                 
@@ -1440,6 +1482,7 @@
             }
             document.getElementById('weekViewBtn').addEventListener('click', () => switchView('week'));
             document.getElementById('dayViewBtn').addEventListener('click', () => switchView('day'));
+            structureSelect.addEventListener('change', handleStructureChange);
             form.addEventListener('submit', handleFormSubmit);
             cancelEditBtn.addEventListener('click', cancelEdit);
             deleteBtn.addEventListener('click', showDeleteConfirmation);
@@ -1450,6 +1493,7 @@
             errorModal.addEventListener('click', (e) => { if (e.target === errorModal) hideErrorModal(); });
             populateLongueurOptions();
             initializeDatePickers();
+            handleStructureChange();
             // Initialisation de la classe de vue au chargement
             planningContainer.classList.add(`view-${currentView}`);
             render();
