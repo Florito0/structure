@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planning de Planification des Structures</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --background-color: #f8f9fa;
+            --surface-color: #ffffff;
+            --border-color: #dee2e6;
+            --text-color: #212529;
+            --preparation-bg: #e9ecef;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --violet-highlight: rgba(139, 92, 246, 0.25);
+            --blue-highlight: rgba(59, 130, 246, 0.25);
+            --red-highlight: rgba(239, 68, 68, 0.25);
+            --main-event-color: #8b5cf6;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 1rem;
+            font-size: 14px;
+        }
+        .controls-container {
+            background-color: var(--surface-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+        
+        .controls-container h1 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1rem 1.5rem;
+        }
+        .form-field { 
+            display: flex; 
+            flex-direction: column; 
+        }
+        
+        .form-field label { 
+            font-weight: 500; 
+            margin-bottom: 0.5rem; 
+        }
+        .form-field input,
+        .form-field select {
+            padding: 0.6rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1em;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: #fff;
+        }
+        .form-field input:focus,
+        .form-field select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+        .form-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .form-actions button {
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover { 
+            background-color: #0056b3; 
+        }
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .btn-secondary:hover { 
+            background-color: #545b62; 
+        }
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-danger:hover { 
+            background-color: #c82333; 
+        }
+        .edit-mode-indicator {
+            background-color: var(--warning-color);
+            color: #856404;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        .planning-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .nav-controls { 
+            display: flex; 
+            align-items: center; 
+            gap: 0.5rem; 
+        }
+        
+        #currentMonthYear { 
+            font-size: 1.25rem; 
+            font-weight: 600; 
+            min-width: 150px; 
+            text-align: center; 
+        }
+        
+        .view-switcher button {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+        }
+        
+        .view-switcher button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .view-switcher button:first-child { 
+            border-radius: 6px 0 0 6px; 
+        }
+        
+        .view-switcher button:last-child { 
+            border-radius: 0 6px 6px 0; 
+        }
+        
+        .planning-container {
+            position: relative; 
+            overflow-x: auto;
+            overflow-y: auto;
+            background-color: var(--surface-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            scrollbar-gutter: stable;
+            max-height: 80vh;
+        }
+        .planning-container::-webkit-scrollbar { 
+            height: 14px;
+            width: 14px;
+        }
+        
+        .planning-container::-webkit-scrollbar-track { 
+            background: #f1f1f1; 
+            border-radius: 8px;
+            margin: 2px;
+        }
+        
+        .planning-container::-webkit-scrollbar-thumb { 
+            background: linear-gradient(45deg, #c1c1c1, #a8a8a8);
+            border-radius: 8px;
+            border: 2px solid #f1f1f1;
+        }
+        
+        .planning-container::-webkit-scrollbar-thumb:hover { 
+            background: linear-gradient(45deg, #a8a8a8, #909090);
+        }
+        
+        .planning-container::-webkit-scrollbar-corner {
+            background: #f1f1f1;
+        }
+        .planning-container {
+            scrollbar-width: auto;
+            scrollbar-color: #c1c1c1 #f1f1f1;
+        }
+        table.planning-grid {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            min-width: 4200px; 
+        }
+        .planning-grid th, .planning-grid td {
+            border: 1px solid var(--border-color);
+            padding: 0.5rem;
+            text-align: center;
+            font-size: 0.8rem;
+            min-width: 100px;
+            transition: height 0.2s ease-in-out;
+        }
+        .planning-container.view-week .planning-grid td,
+        .planning-container.view-week .planning-grid th {
+            height: 65px;
+        }
+        .planning-grid th {
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .planning-grid th.main-header { 
+            background-color: #e2e2e2; 
+            top: 0; 
+        }
+        
+        .planning-grid th.sub-header { 
+            background-color: #f2f2f2; 
+            top: 41px; 
+        }
+        
+        .main-header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .toggle-dispo-btn {
+            cursor: pointer;
+            font-size: 1em;
+            margin-left: 10px;
+            font-weight: bold;
+            color: var(--primary-color);
+            user-select: none;
+        }
+        .planning-grid .collapsed {
+            display: none;
+        }
+        
+        .dispo-summary-cell {
+            font-weight: bold;
+            color: var(--secondary-color);
+            background-color: #f8f9fa;
+        }
+        .planning-grid .date-col {
+            min-width: 100px;
+            font-weight: 500;
+            background-color: var(--surface-color);
+            position: sticky;
+            left: 0;
+            z-index: 25;
+        }
+        .sticky-col-right {
+            position: sticky;
+            z-index: 25;
+        }
+        .domes-virtuel-col { right: 0; }
+        .domes-main-col { right: 100px; }
+        
+        .inventory-col {
+            font-weight: bold;
+            background-color: #e6f7ff !important;
+        }
+        .inventory-col.domes-header {
+            background-color: #fef2f2 !important;
+            color: #991b1b;
+            border-left: 3px solid #f87171;
+        }
+        .col-group-small { background-color: #fafafa; }
+        .col-group-15m { background-color: #f0f9ff; }
+        .col-group-20m { background-color: #f7fee7; }
+        .col-group-25m { background-color: #faf5ff; }
+        .col-group-25x65h4 { background-color: #f3e8ff; }
+        .col-group-30m { background-color: #e0f2fe; }
+
+        .planning-grid .weekend { 
+            box-shadow: inset 0 0 0 2000px rgba(0, 0, 0, 0.05); 
+        }
+        
+        .planning-grid .holiday { 
+            box-shadow: inset 0 0 0 2000px rgba(180, 83, 9, 0.1); 
+        }
+        
+        .planning-grid .weekend.holiday { 
+            box-shadow: inset 0 0 0 2000px rgba(180, 83, 9, 0.15); 
+        }
+        
+        .planning-grid tbody tr:hover td { 
+            box-shadow: inset 0 0 0 2000px rgba(0, 0, 0, 0.08); 
+        }
+        .event-block {
+            position: absolute; 
+            z-index: 20; 
+            box-sizing: border-box;
+            overflow: hidden; 
+            font-size: 0.85em; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15); 
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 6px;
+        }
+        
+        .event-block:hover {
+            transform: scale(1.03);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            z-index: 22 !important;
+        }
+        .event-line { 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            line-height: 1.3;
+            display: block;
+        }
+        
+        .event-contrat { 
+            font-weight: 700; 
+        }
+        
+        .event-ville { 
+            font-weight: 600; 
+        }
+        
+        .event-block.unified-period {
+            background-color: transparent;
+            border: 1px solid rgba(0,0,0,0.2);
+            padding: 0;
+            z-index: 18;
+        }
+        .event-block-content {
+            position: absolute;
+            width: 100%;
+            left: 0;
+            box-sizing: border-box;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .prep-part {
+            top: 0;
+            background-color: var(--preparation-bg);
+            color: var(--text-color);
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        .main-part {
+            background-color: var(--main-event-color);
+        }
+        .event-info-wrapper {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            padding: 4px 6px;
+            box-sizing: border-box;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .event-marker {
+            position: absolute;
+            left: 5px;
+            font-weight: bold;
+            color: white;
+            font-size: 1em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            user-select: none;
+            z-index: 2;
+            display: flex;
+            align-items: baseline;
+            white-space: nowrap;
+        }
+        
+        .marker-date {
+            font-weight: normal;
+            font-size: 0.9em;
+            margin-left: 4px;
+            opacity: 0.9;
+        }
+        
+        .demontage-marker {
+             color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: var(--surface-color);
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+            text-align: center;
+        }
+        .modal-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .modal-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .flatpickr-calendar.violet .flatpickr-day.selected,
+        .flatpickr-calendar.violet .flatpickr-day.startRange,
+        .flatpickr-calendar.violet .flatpickr-day.endRange {
+            background: #8b5cf6 !important;
+            border-color: #8b5cf6 !important;
+            color: white !important;
+        }
+        
+        .flatpickr-calendar.violet .flatpickr-day.inRange {
+            background: #ede9fe !important;
+            border-color: #c4b5fd !important;
+            color: #6d28d9 !important;
+        }
+        .flatpickr-calendar.blue .flatpickr-day.selected,
+        .flatpickr-calendar.blue .flatpickr-day.startRange,
+        .flatpickr-calendar.blue .flatpickr-day.endRange {
+            background: #3b82f6 !important;
+            border-color: #3b82f6 !important;
+            color: white !important;
+        }
+        
+        .flatpickr-calendar.blue .flatpickr-day.inRange {
+            background: #dbeafe !important;
+            border-color: #93c5fd !important;
+            color: #1d4ed8 !important;
+        }
+        .flatpickr-calendar.red .flatpickr-day.selected,
+        .flatpickr-calendar.red .flatpickr-day.startRange,
+        .flatpickr-calendar.red .flatpickr-day.endRange {
+            background: #ef4444 !important;
+            border-color: #ef4444 !important;
+            color: white !important;
+        }
+        
+        .flatpickr-calendar.red .flatpickr-day.inRange {
+            background: #fee2e2 !important;
+            border-color: #fca5a5 !important;
+            color: #dc2626 !important;
+        }
+        
+        .flatpickr-day.highlight-violet {
+            background-color: var(--violet-highlight);
+            border-color: var(--violet-highlight);
+        }
+        .flatpickr-day.highlight-blue {
+            background-color: var(--blue-highlight);
+            border-color: var(--blue-highlight);
+        }
+        .flatpickr-day.highlight-red {
+            background-color: var(--red-highlight);
+            border-color: var(--red-highlight);
+        }
+        .flatpickr-day.selected.highlight-violet,
+        .flatpickr-day.selected.highlight-blue,
+        .flatpickr-day.selected.highlight-red {
+            box-shadow: inset 0 0 0 2px var(--surface-color);
+        }
+        .form-field label[for="dateManif"]:before {
+            content: "●";
+            color: #8b5cf6;
+            font-size: 1.2em;
+            margin-right: 0.5rem;
+        }
+        
+        .form-field label[for="dateMontage"]:before {
+            content: "●";
+            color: #3b82f6;
+            font-size: 1.2em;
+            margin-right: 0.5rem;
+        }
+        
+        .form-field label[for="dateDemontage"]:before {
+            content: "●";
+            color: #ef4444;
+            font-size: 1.2em;
+            margin-right: 0.5rem;
+        }
+        .planning-container.view-week .planning-grid th.sub-header {
+            height: 0px !important;
+        }
+        .planning-container.view-week .planning-grid th.main-header {
+            height: 0px !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls-container">
+        <h1>Ajouter une Réservation</h1>
+        <div id="editModeIndicator" class="edit-mode-indicator" style="display: none;">
+            Mode édition : modification de la réservation
+        </div>
+        <form id="reservationForm" class="form-grid">
+            <div class="form-field">
+                <label for="contrat">Contrat N°</label>
+                <input type="text" id="contrat" placeholder="ex: DLR42665" required>
+            </div>
+            <div class="form-field">
+                <label for="ville">Ville</label>
+                <input type="text" id="ville" placeholder="ex: Paris" required>
+            </div>
+            <div class="form-field">
+                <label for="structure">Structure</label>
+                <select id="structure" required>
+                    <option value="15M">15M</option>
+                    <option value="20M">20M</option>
+                    <option value="25M">25M</option>
+                    <option value="10M_H5">10M H5</option>
+                    <option value="10M_H4">10M H4</option>
+                    <option value="12M">12M</option>
+                    <option value="25x65H4" title="Sélectionnez la largeur dans le champ ci-dessous">25*65 H4 ou 30*65 H4</option>
+                    <option value="30x95">30*95 H3 et H4</option>
+                </select>
+            </div>
+            <div class="form-field" id="largeurField" style="display: none;">
+                <label for="largeurSelect">Largeur (m)</label>
+                <select id="largeurSelect">
+                    <option value="25">25m</option>
+                    <option value="30">30m</option>
+                </select>
+            </div>
+            <div class="form-field">
+                <label for="longueur">Longueur (m)</label>
+                <select id="longueur" required></select>
+            </div>
+            <div class="form-field">
+                <label for="hauteur">Hauteur</label>
+                <select id="hauteur" required>
+                    <option value="H3">H3</option>
+                    <option value="H4">H4</option>
+                </select>
+            </div>
+            <div class="form-field">
+                <label for="plancher">Plancher</label>
+                <select id="plancher" required>
+                    <option value="AP">AP (Avec Plancher)</option>
+                    <option value="SP">SP (Sans Plancher)</option>
+                </select>
+            </div>
+            
+            <div class="form-field">
+                <label for="interlocuteur">Interlocuteur</label>
+                <select id="interlocuteur" required>
+                    <option value="Erika">Erika</option>
+                    <option value="Stéphanie">Stéphanie</option>
+                    <option value="Cindy">Cindy</option>
+                    <option value="Assistant(e)">Assistant(e)</option>
+                    <option value="Autre">Autre</option>
+                </select>
+            </div>
+            
+            <div class="form-field">
+                <label for="dateManif">Date(s) Manifestation</label>
+                <input type="text" id="dateManif" placeholder="Sélectionner une plage de dates" required>
+            </div>
+            <div class="form-field">
+                <label for="dateMontage">Date(s) Montage</label>
+                <input type="text" id="dateMontage" placeholder="Sélectionner une plage de dates" required>
+            </div>
+            <div class="form-field">
+                <label for="dateDemontage">Date(s) Démontage</label>
+                <input type="text" id="dateDemontage" placeholder="Sélectionner une plage de dates" required>
+            </div>
+            <div class="form-field">
+                <label for="delaiPrep">Délai Préparation (jours)</label>
+                <input type="number" id="delaiPrep" value="4" min="0" required>
+            </div>
+            <div class="form-field">
+                <label for="dispo">Demande de dispo</label>
+                <select id="dispo" required>
+                    <option value="Non" selected>Non</option>
+                    <option value="Oui">Oui</option>
+                </select>
+            </div>
+            <div class="form-actions">
+                <button type="button" id="cancelEditBtn" class="btn-secondary" style="display: none;">Annuler</button>
+                <button type="button" id="deleteBtn" class="btn-danger" style="display: none;">Supprimer</button>
+                <button type="submit" id="submitBtn" class="btn-primary">Ajouter au Planning</button>
+            </div>
+        </form>
+    </div>
+    <div class="planning-controls">
+        <div class="nav-controls">
+            <h2 id="currentMonthYear"></h2>
+        </div>
+        <div class="view-switcher">
+            <button id="dayViewBtn">Jour</button>
+            <button id="weekViewBtn" class="active">Semaine</button>
+        </div>
+    </div>
+    
+    <div class="planning-container" id="planningContainer">
+        <table class="planning-grid" id="planningGrid"></table>
+    </div>
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <h3>Confirmer la suppression</h3>
+            <p>Êtes-vous sûr de vouloir supprimer cette réservation ?</p>
+            <div class="modal-buttons">
+                <button id="confirmDelete" class="btn-danger">Supprimer</button>
+                <button id="cancelDelete" class="btn-secondary">Annuler</button>
+            </div>
+        </div>
+    </div>
+    <div id="errorModal" class="modal">
+        <div class="modal-content">
+            <h3>Erreur de disponibilité</h3>
+            <p id="errorMessage"></p>
+            <div class="modal-buttons">
+                <button id="closeError" class="btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            // NOUVEAU : Objet pour mapper les interlocuteurs aux couleurs
+            const interlocuteurColors = {
+                'Erika': '#8b5cf6',
+                'Stéphanie': '#3b82f6', // Bleu
+                'Cindy': '#854d0e',     // Marron
+                'Assistant(e)': '#16a34a',// Vert
+                'Autre': '#f97316'      // Orange
+            };
+
+            // MODIFIÉ : Propriétés "startCol" supprimées car inutiles et sources d'erreurs
+            const structureInventory = {
+                "10M_H5": { name: "10*10 Arquée H5", cols: 1, cssClass: 'col-group-small' },
+                "10M_H4": { name: "10*50 Arquée H4", cols: 1, cssClass: 'col-group-small' },
+                "12M":    { name: "12*25 Arquée H3", cols: 1, cssClass: 'col-group-small' },
+                "15M":    { name: "15M Arquée",        cols: 8, cssClass: 'col-group-15m', sub: ["H3", "H3", "H3", "H3", "H3", "H3", "H3/H4", "H3/H4"], fermes: 51 },
+                "20M":    { name: "20M Arquée",        cols: 7, cssClass: 'col-group-20m', sub: ["H3", "H3", "H3", "H3", "H3/H4", "H3/H4", "H3/H4"], fermes: 54 },
+                "25M":    { name: "25M Arquée",        cols: 3, cssClass: 'col-group-25m', sub: ["H3", "H3", "H3"], fermes: 54 },
+                "Domes":  { name: "Domes",           cols: 1, cssClass: 'inventory-col', fermes: 89 },
+                "25x65H4":{ name: "25*65 H4 ou 30*65 H4", cols: 1, cssClass: 'col-group-25x65h4', sub: ["H4"], fermes: 14 },
+                "30x95":  { name: "30*95",           cols: 2, cssClass: 'col-group-30m', sub: ["H3", "H4"], fermes: 20 }
+            };
+            
+            let dynamicDispoColumns = {
+                'small_structures': [],
+                '15M': [], 
+                '20M_25M': [],
+                '25x65H4': [],
+                '30x95': [],
+            };
+            let collapsedSections = {
+                'small_structures': false,
+                '15M': false,
+                '20M_25M': false,
+                '25x65H4': false,
+                '30x95': false,
+            };
+
+            let reservations = [];
+            let currentView = 'week';
+            let editingReservationId = null;
+            let datePickers = {};
+            const planningContainer = document.getElementById('planningContainer');
+            const planningGrid = document.getElementById('planningGrid');
+            const currentMonthYearEl = document.getElementById('currentMonthYear');
+            const form = document.getElementById('reservationForm');
+            const structureSelect = document.getElementById('structure');
+            const longueurSelect = document.getElementById('longueur');
+            const largeurField = document.getElementById('largeurField');
+            const largeurSelect = document.getElementById('largeurSelect');
+            const editModeIndicator = document.getElementById('editModeIndicator');
+            const cancelEditBtn = document.getElementById('cancelEditBtn');
+            const deleteBtn = document.getElementById('deleteBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            const confirmModal = document.getElementById('confirmModal');
+            const errorModal = document.getElementById('errorModal');
+
+            function getGroupKey(structure) {
+                if (['10M_H5', '10M_H4', '12M'].includes(structure)) return 'small_structures';
+                if (structure === '15M') return '15M';
+                if (['20M', '25M'].includes(structure)) return '20M_25M';
+                if (structure === '25x65H4') return '25x65H4';
+                if (structure === '30x95') return '30x95';
+                return null;
+            }
+
+            function getFrenchPublicHolidays() {
+                const holidays = new Set();
+                holidays.add('2026-01-01');  
+                holidays.add('2026-04-06');  
+                holidays.add('2026-05-01');
+                holidays.add('2026-05-08');  
+                holidays.add('2026-05-14');  
+                holidays.add('2026-05-25');
+                holidays.add('2026-07-14');  
+                holidays.add('2026-08-15');  
+                holidays.add('2026-11-01');
+                holidays.add('2026-11-11');  
+                holidays.add('2026-12-25');
+                return holidays;
+            }
+            function populateLongueurOptions() {
+                longueurSelect.innerHTML = '';
+                for (let i = 0; i <= 100; i += 5) {
+                    const opt = document.createElement('option'); 
+                    opt.value = i; 
+                    opt.textContent = i + 'm'; 
+                    longueurSelect.appendChild(opt);
+                }
+            }
+            function handleStructureChange() {
+                 const structureValue = structureSelect.value;
+                largeurField.style.display = 'none';
+
+                if (structureValue === '25x65H4') {
+                    largeurField.style.display = 'block';
+                    longueurSelect.innerHTML = '';
+                    for (let i = 0; i <= 65; i += 5) {
+                        const opt = document.createElement('option');
+                        opt.value = i;
+                        opt.textContent = i + 'm';
+                        longueurSelect.appendChild(opt);
+                    }
+                } else if (structureValue === '30x95') {
+                    longueurSelect.innerHTML = '';
+                    for (let i = 0; i <= 95; i += 5) {
+                        const opt = document.createElement('option');
+                        opt.value = i;
+                        opt.textContent = i + 'm';
+                        longueurSelect.appendChild(opt);
+                    }
+                }
+                else {
+                    populateLongueurOptions();
+                }
+            }
+            function calculateFermes(longueur) {
+                if (longueur === 0) return 0;
+                return (longueur / 5) + 1;
+            }
+            function calculateBusinessDaysBack(startDate, businessDays) {
+                const holidays = getFrenchPublicHolidays();
+                let currentDate = new Date(startDate);
+                let remainingDays = businessDays;
+                
+                currentDate.setDate(currentDate.getDate() - 1);
+                
+                while (remainingDays > 0) {
+                    const dateString = currentDate.toISOString().slice(0, 10);
+                    const dayOfWeek = currentDate.getDay();
+                    
+                    if (dayOfWeek !== 0 && dayOfWeek !== 6 && !holidays.has(dateString)) {
+                        remainingDays--;
+                    }
+                    
+                    if (remainingDays > 0) {
+                        currentDate.setDate(currentDate.getDate() - 1);
+                    }
+                }
+                
+                return currentDate.toISOString().slice(0, 10);
+            }
+            function getDatesForView() {
+                const dates = [];
+                const year = 2026;
+                
+                if (currentView === 'week') {
+                    const firstSat = new Date(year, 0, 1);
+                    while (firstSat.getDay() !== 6) {
+                        firstSat.setDate(firstSat.getDate() + 1);
+                    }
+                    for (let d = new Date(firstSat); d.getFullYear() === year; d.setDate(d.getDate() + 7)) {
+                        dates.push(new Date(d));
+                    }
+                } else {
+                    for (let d = new Date(year, 0, 1); d.getFullYear() === year; d.setDate(d.getDate() + 1)) {
+                        dates.push(new Date(d));
+                    }
+                }
+                return dates;
+            }
+            
+            // NOUVEAU : Fonction pour calculer dynamiquement la colonne de départ d'une structure
+            function getActualStartColumn(structureKey) {
+                const getVisibleDispoCols = (groupKey) => collapsedSections[groupKey] ? 1 : Math.max(1, dynamicDispoColumns[groupKey].length);
+                const smallDispoCols = getVisibleDispoCols('small_structures');
+                const dispo15MCols = getVisibleDispoCols('15M');
+                const dispo20MCols = getVisibleDispoCols('20M_25M');
+                const dispo25x65Cols = getVisibleDispoCols('25x65H4');
+
+                // Le +1 initial correspond à la toute première colonne "Semaine"
+                switch (structureKey) {
+                    case '10M_H5': return 1;
+                    case '10M_H4': return 2;
+                    case '12M':   return 3;
+                    case '15M':   return 1 + 3 + smallDispoCols;
+                    case '20M':
+                    case '25M':   return 1 + 3 + smallDispoCols + 8 + 2 + dispo15MCols + 1; // +1 pour la 2e colonne date
+                    case '25x65H4': return 1 + 3 + smallDispoCols + 8 + 2 + dispo15MCols + 1 + 10 + 2 + dispo20MCols + 2; // +2 pour Domes et Domes virtuel
+                    case '30x95': return 1 + 3 + smallDispoCols + 8 + 2 + dispo15MCols + 1 + 10 + 2 + dispo20MCols + 2 + 1 + 2 + dispo25x65Cols;
+                    default: return 0; // Sécurité, ne devrait pas arriver
+                }
+            }
+            
+            // MODIFIÉ : Utilise maintenant getActualStartColumn
+            function findAvailableColumn(sType, start, end, hauteur, excludeId = null) {
+                const s = structureInventory[sType]; 
+                if (!s) return -1;
+                
+                const startDate = new Date(start);
+                const endDate = new Date(end);
+                
+                let availableColumns = [];
+                for (let i = 0; i < s.cols; i++) {
+                    const colIndex = getActualStartColumn(sType) + i;
+                    
+                    if (s.sub) {
+                        const subHeader = s.sub[i];
+                        if (hauteur === 'H4' && subHeader === 'H3') {
+                            continue;
+                        }
+                        if (hauteur === 'H3' && subHeader.includes('H3')) {
+                            availableColumns.push(colIndex);
+                        } else if (hauteur === 'H4' && subHeader.includes('H4')) {
+                            availableColumns.push(colIndex);
+                        }
+                    } else {
+                        availableColumns.push(colIndex);
+                    }
+                }
+                
+                for (const colIndex of availableColumns) {
+                    if (reservations.every(res => 
+                        res.dispo === 'Oui' ||
+                        res.id === excludeId ||
+                        res.columnIndex !== colIndex || 
+                        new Date(res.overallEndDate) < startDate || 
+                        new Date(res.overallStartDate) > endDate
+                    )) {
+                        return colIndex;
+                    }
+                }
+                
+                return -1;
+            }
+            function showErrorModal(message) {
+                document.getElementById('errorMessage').textContent = message;
+                errorModal.style.display = 'block';
+            }
+            function hideErrorModal() {
+                errorModal.style.display = 'none';
+            }
+            function showDeleteConfirmation() {
+                confirmModal.style.display = 'block';
+            }
+            function hideDeleteConfirmation() {
+                confirmModal.style.display = 'none';
+            }
+            function cancelEdit() {
+                editingReservationId = null;
+                form.reset();
+                populateLongueurOptions();
+                handleStructureChange();
+                
+                editModeIndicator.style.display = 'none';
+                cancelEditBtn.style.display = 'none';
+                deleteBtn.style.display = 'none';
+                submitBtn.textContent = 'Ajouter au Planning';
+                
+                initializeDatePickers();
+                Object.values(datePickers).forEach(p => p.redraw());
+            }
+            function confirmDelete() {
+                if (editingReservationId) {
+                    const resIndex = reservations.findIndex(r => r.id === editingReservationId);
+                    if (resIndex > -1) {
+                        const res = reservations[resIndex];
+                        if (res.dispo === 'Oui') {
+                            const groupKey = getGroupKey(res.structure);
+                            if (groupKey && dynamicDispoColumns[groupKey]) {
+                               const dispoIndex = dynamicDispoColumns[groupKey].findIndex(d => d.id === editingReservationId);
+                                if (dispoIndex > -1) {
+                                    dynamicDispoColumns[groupKey].splice(dispoIndex, 1);
+                                }
+                            }
+                        }
+                        reservations.splice(resIndex, 1);
+                    }
+
+                    cancelEdit();
+                    render();
+                }
+                hideDeleteConfirmation();
+            }
+            const parseDMY = (dmy) => {
+                const p = dmy.split('/');
+                return new Date(p[2], p[1] - 1, p[0]);
+            };
+            function getDatesFromRange(rangeStr) {
+                if (!rangeStr || !rangeStr.includes('/')) return [];
+                
+                const dates = [];
+                const parts = rangeStr.split(' au ');
+                const startDate = parseDMY(parts[0]);
+                const endDate = parts.length > 1 ? parseDMY(parts[1]) : new Date(startDate);
+                
+                let currentDate = new Date(startDate);
+                endDate.setHours(23);
+                while (currentDate <= endDate) {
+                    dates.push(currentDate.toISOString().slice(0, 10));
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+                return dates;
+            }
+            function initializeDatePickers() {
+                const pickerConfigs = [
+                    { id: 'dateManif', color: 'violet', highlightClass: 'highlight-violet' },
+                    { id: 'dateMontage', color: 'blue', highlightClass: 'highlight-blue' },
+                    { id: 'dateDemontage', color: 'red', highlightClass: 'highlight-red' }
+                ];
+                
+                pickerConfigs.forEach(config => {
+                    const baseConfig = {
+                        mode: "range",
+                        dateFormat: "d/m/Y",
+                        locale: 'fr',
+                        minDate: "01/01/2026",
+                        maxDate: "31/12/2026",
+                        onReady: function(selectedDates, dateStr, instance) {
+                            instance.calendarContainer.classList.add(config.color);
+                        },
+                        onClose: function() {
+                            Object.values(datePickers).forEach(pickerInstance => {
+                                if (pickerInstance) pickerInstance.redraw();
+                            });
+                        },
+                        onDayCreate: function(dObj, dStr, fp, dayElem) {
+                            const currentDayStr = dayElem.dateObj.toISOString().slice(0, 10);
+                            
+                            pickerConfigs.forEach(otherConfig => {
+                                if (otherConfig.id === config.id) return;
+                
+                                const otherDates = getDatesFromRange(document.getElementById(otherConfig.id).value);
+                                if (otherDates.includes(currentDayStr)) {
+                                    dayElem.classList.add(otherConfig.highlightClass);
+                                }
+                            });
+                        }
+                    };
+                    
+                    if(datePickers[config.id]) {
+                        datePickers[config.id].destroy();
+                    }
+                    datePickers[config.id] = flatpickr(`#${config.id}`, baseConfig);
+                });
+            }
+            function switchView(view) {
+                currentView = view;
+                document.getElementById('weekViewBtn').classList.toggle('active', view === 'week');
+                document.getElementById('dayViewBtn').classList.toggle('active', view === 'day');
+                
+                planningContainer.classList.remove('view-day', 'view-week');
+                planningContainer.classList.add(`view-${view}`);
+                render();
+            }
+            function toggleDispoSection(groupKey) {
+                collapsedSections[groupKey] = !collapsedSections[groupKey];
+                render();
+            }
+
+            function generateGridHeader() {
+                const thead = document.createElement('thead');
+                const mainHeaderRow = document.createElement('tr');
+                const subHeaderRow = document.createElement('tr');
+                
+                const createTh = (text, colspan = 1, className = '') => {
+                    const th = document.createElement('th'); 
+                    th.innerHTML = text;
+                    th.colSpan = colspan;
+                    if (className) th.className = className; 
+                    return th;
+                };
+
+                const createDispoHeader = (groupKey, title) => {
+                     const isCollapsed = collapsedSections[groupKey];
+                     const dispoColsCount = dynamicDispoColumns[groupKey].length;
+                     const button = `<span class="toggle-dispo-btn" data-group="${groupKey}">${isCollapsed ? '&#9654;' : '&#9664;'}</span>`;
+                     const headerText = `<div class="main-header-content">${title} ${button}</div>`;
+
+                     if (isCollapsed) {
+                         mainHeaderRow.appendChild(createTh(headerText, 1, 'main-header'));
+                         subHeaderRow.appendChild(createTh('#', 1, 'sub-header'));
+                     } else {
+                         mainHeaderRow.appendChild(createTh(headerText, Math.max(1, dispoColsCount), 'main-header')); 
+                         for (let i = 0; i < Math.max(1, dispoColsCount); i++) {
+                             subHeaderRow.appendChild(createTh(i + 1, 1, 'sub-header'));
+                         }
+                     }
+                };
+                
+                mainHeaderRow.appendChild(createTh(currentView === 'week' ? 'Semaine' : 'Date', 1, 'main-header'));
+                subHeaderRow.appendChild(createTh('', 1, 'sub-header'));
+                
+                // --- Section Small Structures ---
+                ['10M_H5', '10M_H4', '12M'].forEach(key => {
+                    const s = structureInventory[key];
+                    mainHeaderRow.appendChild(createTh(s.name, s.cols, `main-header ${s.cssClass}`));
+                    subHeaderRow.appendChild(createTh('', 1, `sub-header ${s.cssClass}`));
+                });
+                createDispoHeader('small_structures', 'Demande de dispo');
+
+                // --- Section 15M ---
+                const s15 = structureInventory['15M'];
+                mainHeaderRow.appendChild(createTh(s15.name, s15.cols, `main-header ${s15.cssClass}`));
+                s15.sub.forEach(sub => subHeaderRow.appendChild(createTh(sub, 1, `sub-header ${s15.cssClass}`)));
+                mainHeaderRow.appendChild(createTh('Fermes', 1, 'main-header')); 
+                subHeaderRow.appendChild(createTh(s15.fermes, 1, 'sub-header'));
+                mainHeaderRow.appendChild(createTh('Fermes Virtuel', 1, 'main-header inventory-col')); 
+                subHeaderRow.appendChild(createTh('', 1, 'sub-header inventory-col'));
+                createDispoHeader('15M', 'Demande de dispo');
+                
+                mainHeaderRow.appendChild(createTh(currentView === 'week' ? 'Semaine' : 'Date', 1, 'main-header')); 
+                subHeaderRow.appendChild(createTh('', 1, 'sub-header'));
+
+                // --- Section 20M & 25M ---
+                ['20M', '25M'].forEach(key => {
+                    const s = structureInventory[key];
+                    mainHeaderRow.appendChild(createTh(s.name, s.cols, `main-header ${s.cssClass}`));
+                    s.sub.forEach(sub => subHeaderRow.appendChild(createTh(sub, 1, `sub-header ${s.cssClass}`)));
+                });
+                mainHeaderRow.appendChild(createTh('Fermes', 1, 'main-header')); 
+                subHeaderRow.appendChild(createTh(structureInventory['20M'].fermes, 1, 'sub-header'));
+                mainHeaderRow.appendChild(createTh('Fermes Virtuel', 1, 'main-header inventory-col')); 
+                subHeaderRow.appendChild(createTh('', 1, 'sub-header inventory-col'));
+                createDispoHeader('20M_25M', 'Demande de dispo');
+                
+                // --- Section Domes ---
+                const sDomes = structureInventory['Domes'];
+                mainHeaderRow.appendChild(createTh(sDomes.name, sDomes.cols, `main-header ${sDomes.cssClass} domes-header sticky-col-right domes-main-col`));
+                subHeaderRow.appendChild(createTh(sDomes.fermes, 1, `sub-header ${sDomes.cssClass} domes-header sticky-col-right domes-main-col`));
+                mainHeaderRow.appendChild(createTh('Domes virtuel', 1, `main-header inventory-col domes-header sticky-col-right domes-virtuel-col`));
+                subHeaderRow.appendChild(createTh('', 1, `sub-header inventory-col domes-header sticky-col-right domes-virtuel-col`));
+                
+                // --- Section 25x65 H4 ---
+                const s25x65H4 = structureInventory['25x65H4'];
+                mainHeaderRow.appendChild(createTh(s25x65H4.name, s25x65H4.cols, `main-header ${s25x65H4.cssClass}`));
+                s25x65H4.sub.forEach(sub => subHeaderRow.appendChild(createTh(sub, 1, `sub-header ${s25x65H4.cssClass}`)));
+                mainHeaderRow.appendChild(createTh('Fermes', 1, 'main-header')); 
+                subHeaderRow.appendChild(createTh(s25x65H4.fermes, 1, 'sub-header'));
+                mainHeaderRow.appendChild(createTh('Fermes Virtuel', 1, 'main-header inventory-col')); 
+                subHeaderRow.appendChild(createTh('', 1, 'sub-header inventory-col'));
+                createDispoHeader('25x65H4', 'Demande de dispo');
+
+                // --- Section 30x95 ---
+                const s30x95 = structureInventory['30x95'];
+                mainHeaderRow.appendChild(createTh(s30x95.name, s30x95.cols, `main-header ${s30x95.cssClass}`));
+                s30x95.sub.forEach(sub => subHeaderRow.appendChild(createTh(sub, 1, `sub-header ${s30x95.cssClass}`)));
+                mainHeaderRow.appendChild(createTh('Fermes', 1, 'main-header')); 
+                subHeaderRow.appendChild(createTh(s30x95.fermes, 1, 'sub-header'));
+                mainHeaderRow.appendChild(createTh('Fermes Virtuel', 1, 'main-header inventory-col')); 
+                subHeaderRow.appendChild(createTh('', 1, 'sub-header inventory-col'));
+                createDispoHeader('30x95', 'Demande de dispo');
+
+                thead.appendChild(mainHeaderRow); 
+                thead.appendChild(subHeaderRow);
+                planningGrid.appendChild(thead);
+            }
+            
+            function generateGridBody(dates) {
+                const tbody = document.createElement('tbody');
+                const holidays = getFrenchPublicHolidays();
+                
+                const totalFermes = {
+                    '15M': structureInventory['15M'].fermes,
+                    '20M_25M': structureInventory['20M'].fermes,
+                    'Domes': structureInventory['Domes'].fermes,
+                    '25x65H4': structureInventory['25x65H4'].fermes,
+                    '30x95': structureInventory['30x95'].fermes
+                };
+
+                dates.forEach(date => {
+                    const tr = document.createElement('tr');
+                    const localDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+                    const dateString = localDate.toISOString().slice(0, 10);
+                    tr.dataset.date = dateString;
+                    
+                    let remainingFermes = {...totalFermes};
+                    let domesDemandesEnDispo = 0;
+                    
+                    let demandesDispoFermes = {
+                        'small_structures': 0, '15M': 0, '20M_25M': 0, '25x65H4': 0, '30x95': 0
+                    };
+                    
+                    reservations.forEach(res => {
+                        if (dateString >= res.overallStartDate && dateString <= res.overallEndDate) {
+                            const groupKey = getGroupKey(res.structure);
+                            if (res.dispo !== 'Oui') {
+                                if (res.structure === '15M') remainingFermes['15M'] -= res.fermes;
+                                else if (['20M', '25M'].includes(res.structure)) remainingFermes['20M_25M'] -= res.fermes;
+                                else if (res.structure === '25x65H4') remainingFermes['25x65H4'] -= res.fermes;
+                                else if (res.structure === '30x95') remainingFermes['30x95'] -= res.fermes;
+                                
+                                // MODIFIÉ : Inclut les petites structures dans le calcul des dômes
+                                if (res.fermes > 0 && res.structure !== '25x65H4' && res.structure !== '30x95') {
+                                    remainingFermes['Domes'] -= res.fermes;
+                                }
+
+                            } else if (groupKey) {
+                                demandesDispoFermes[groupKey] += res.fermes || 0;
+                                // MODIFIÉ : Inclut les petites structures dans le calcul des dômes
+                                if (res.fermes > 0 && res.structure !== '25x65H4' && res.structure !== '30x95') {
+                                    domesDemandesEnDispo += res.fermes;
+                                }
+                            }
+                        }
+                    });
+
+                    const createCell = (className = '') => {
+                        const td = document.createElement('td');
+                        if(className) td.className = className;
+                        return td;
+                    }
+
+                    const createDispoCells = (groupKey) => {
+                         const dispoColsCount = collapsedSections[groupKey] ? 1 : Math.max(1, dynamicDispoColumns[groupKey].length);
+                         for (let i = 0; i < dispoColsCount; i++) {
+                             const cell = collapsedSections[groupKey] ? createCell('dispo-summary-cell') : createCell();
+                             tr.appendChild(cell);
+                         }
+                    };
+                    
+                    const displayDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+                    const dateLocale = currentView === 'week' ? 
+                        `Sem. ${displayDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}` : 
+                        displayDate.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
+                    
+                    tr.appendChild(createCell('date-col')).textContent = dateLocale;
+                    
+                    // --- Small Structures ---
+                    ['10M_H5', '10M_H4', '12M'].forEach(key => {
+                         tr.appendChild(createCell(structureInventory[key].cssClass));
+                    });
+                    createDispoCells('small_structures');
+
+                    // --- 15M ---
+                    for(let i = 0; i < structureInventory['15M'].cols; i++) tr.appendChild(createCell(structureInventory['15M'].cssClass));
+                    tr.appendChild(createCell('inventory-col')).textContent = remainingFermes['15M'];
+                    const fv15M = remainingFermes['15M'] - demandesDispoFermes['15M'];
+                    const fv15MCell = createCell('inventory-col');
+                    fv15MCell.textContent = fv15M;
+                    if (fv15M < 0) fv15MCell.style.cssText = 'color: #dc3545; font-weight: bold;';
+                    tr.appendChild(fv15MCell);
+                    createDispoCells('15M');
+                    
+                    tr.appendChild(createCell('date-col')).textContent = dateLocale;
+                    
+                    // --- 20M & 25M ---
+                    ['20M', '25M'].forEach(key => {
+                        for(let i = 0; i < structureInventory[key].cols; i++) tr.appendChild(createCell(structureInventory[key].cssClass));
+                    });
+                    tr.appendChild(createCell('inventory-col')).textContent = remainingFermes['20M_25M'];
+                    const fv20M = remainingFermes['20M_25M'] - demandesDispoFermes['20M_25M'];
+                    const fv20MCell = createCell('inventory-col');
+                    fv20MCell.textContent = fv20M;
+                    if (fv20M < 0) fv20MCell.style.cssText = 'color: #dc3545; font-weight: bold;';
+                    tr.appendChild(fv20MCell);
+                    createDispoCells('20M_25M');
+                    
+                    // --- Domes ---
+                    tr.appendChild(createCell(`${structureInventory['Domes'].cssClass} domes-header sticky-col-right domes-main-col`)).textContent = remainingFermes['Domes'];
+                    const dvTotal = remainingFermes['Domes'] - domesDemandesEnDispo;
+                    const dvCell = createCell('inventory-col domes-header sticky-col-right domes-virtuel-col');
+                    dvCell.textContent = dvTotal;
+                    if (dvTotal < 0) dvCell.style.cssText = 'color: #dc3545; font-weight: bold;';
+                    tr.appendChild(dvCell);
+
+                    // --- 25x65H4 ---
+                    tr.appendChild(createCell(structureInventory['25x65H4'].cssClass));
+                    tr.appendChild(createCell('inventory-col')).textContent = remainingFermes['25x65H4'];
+                    const fv25x65 = remainingFermes['25x65H4'] - demandesDispoFermes['25x65H4'];
+                    const fv25x65Cell = createCell('inventory-col');
+                    fv25x65Cell.textContent = fv25x65;
+                    if(fv25x65 < 0) fv25x65Cell.style.cssText = 'color: #dc3545; font-weight: bold;';
+                    tr.appendChild(fv25x65Cell);
+                    createDispoCells('25x65H4');
+
+                    // --- 30x95 ---
+                    for(let i = 0; i < structureInventory['30x95'].cols; i++) tr.appendChild(createCell(structureInventory['30x95'].cssClass));
+                    tr.appendChild(createCell('inventory-col')).textContent = remainingFermes['30x95'];
+                    const fv30x95 = remainingFermes['30x95'] - demandesDispoFermes['30x95'];
+                    const fv30x95Cell = createCell('inventory-col');
+                    fv30x95Cell.textContent = fv30x95;
+                    if(fv30x95 < 0) fv30x95Cell.style.cssText = 'color: #dc3545; font-weight: bold;';
+                    tr.appendChild(fv30x95Cell);
+                    createDispoCells('30x95');
+                    
+                    if (displayDate.getDay() === 0 || displayDate.getDay() === 6) {
+                        Array.from(tr.cells).forEach(c => c.classList.add('weekend'));
+                    }
+                    if (holidays.has(dateString)) {
+                        Array.from(tr.cells).forEach(c => c.classList.add('holiday'));
+                    }
+
+                    tbody.appendChild(tr);
+                });
+                planningGrid.appendChild(tbody);
+            }
+
+            function render() {
+                planningGrid.innerHTML = '';
+                currentMonthYearEl.textContent = 'Année 2026';
+                
+                generateGridHeader();
+                
+                document.querySelectorAll('.toggle-dispo-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const groupKey = e.target.dataset.group;
+                        toggleDispoSection(groupKey);
+                    });
+                });
+
+                generateGridBody(getDatesForView());
+                renderReservations();
+            }
+            
+            function renderReservations() {
+                document.querySelectorAll('.event-block').forEach(el => el.remove());
+                
+                // 1. Afficher les réservations confirmées dans leurs colonnes de structure
+                reservations.filter(res => res.dispo !== 'Oui').forEach(res => {
+                    createEventBlock({
+                        res: res,
+                        startDate: new Date(res.overallStartDate),
+                        endDate: new Date(new Date(res.overallEndDate).getTime() + 86400000), 
+                        column: res.columnIndex
+                    });
+                });
+
+                // 2. Afficher les demandes de dispo dans leurs colonnes dédiées
+                Object.keys(dynamicDispoColumns).forEach(key => {
+                    if (!collapsedSections[key]) {
+                        
+                        // Calcul dynamique du nombre de colonnes visibles pour chaque section de dispo
+                        const getVisibleDispoCols = (groupKey) => collapsedSections[groupKey] ? 1 : Math.max(1, dynamicDispoColumns[groupKey].length);
+
+                        const smallDispoCols = getVisibleDispoCols('small_structures');
+                        const dispo15MCols = getVisibleDispoCols('15M');
+                        const dispo20MCols = getVisibleDispoCols('20M_25M');
+                        const dispo25x65Cols = getVisibleDispoCols('25x65H4');
+
+                        let baseIndex = 0;
+                        switch (key) {
+                            case 'small_structures':
+                                baseIndex = 4; // Date(1) + 10M_H5(1) + 10M_H4(1) + 12M(1)
+                                break;
+                            case '15M':
+                                baseIndex = 4 + smallDispoCols + 8 + 2; // ... + 15M(8) + Fermes(1) + Fermes Virtuel(1)
+                                break;
+                            case '20M_25M':
+                                baseIndex = 4 + smallDispoCols + 8 + 2 + dispo15MCols + 1 + 10 + 2; // ... + Date(1) + 20/25M(10) + Fermes(1) + Fermes Virtuel(1)
+                                break; // AJOUT DU BREAK MANQUANT
+                            case '25x65H4':
+                                // Correction : Il y a 5 colonnes à sauter, pas 3 (Domes, Domes Virtuel, 25x65H4, Fermes, Fermes Virtuel)
+                                baseIndex = 4 + smallDispoCols + 8 + 2 + dispo15MCols + 1 + 10 + 2 + dispo20MCols + 5;
+                                break;
+                            case '30x95':
+                                // Correction : On utilise la même base corrigée (+5) et on ajoute les 4 colonnes de la section 30x95 (30x95(2), Fermes, Fermes Virtuel)
+                                baseIndex = 4 + smallDispoCols + 8 + 2 + dispo15MCols + 1 + 10 + 2 + dispo20MCols + 5 + dispo25x65Cols + 4;
+                                break;
+                        }
+
+                        dynamicDispoColumns[key].forEach((res, index) => {
+                             createEventBlock({
+                                 res: res,
+                                 startDate: new Date(res.overallStartDate), 
+                                 endDate: new Date(new Date(res.overallEndDate).getTime() + 86400000), 
+                                 column: baseIndex + index
+                             });
+                        });
+                    }
+                });
+            }
+            
+            // MODIFIÉ : Applique la couleur de l'interlocuteur
+            function createEventBlock({ res, startDate, endDate, column }) {
+                if (column === undefined || column === null || startDate >= endDate) return;
+
+                // NOUVEAU : Récupérer la couleur correspondante, avec une couleur par défaut
+                const eventColor = interlocuteurColors[res.interlocuteur] || interlocuteurColors['Erika'];
+
+                const block = document.createElement('div');
+                const tableBody = planningGrid.querySelector('tbody');
+                block.classList.add('event-block', 'unified-period');
+                block.dataset.reservationId = res.id;
+                
+                if (!tableBody || tableBody.rows.length === 0) return;
+                let startRowIndex = -1, endRowIndex = -1;
+                const startISO = startDate.toISOString().slice(0, 10);
+                
+                for(let i = 0; i < tableBody.rows.length; i++){
+                    const rowDate = tableBody.rows[i].dataset.date;
+                    if(startRowIndex === -1 && rowDate >= startISO) startRowIndex = i;
+                    if(rowDate >= endDate.toISOString().slice(0,10)) { 
+                        endRowIndex = i - 1; 
+                        break; 
+                    }
+                }
+                if (startRowIndex === -1) return; 
+                if (endRowIndex === -1) endRowIndex = tableBody.rows.length - 1;
+                if (endRowIndex < startRowIndex) endRowIndex = startRowIndex;
+                
+                const durationRows = endRowIndex - startRowIndex + 1;
+                if (durationRows <= 0) return;
+                
+                const startRowElement = tableBody.rows[startRowIndex];
+                 if (!startRowElement || !startRowElement.cells[column]) {
+                    console.warn(`Cellule introuvable pour la colonne ${column}, réservation ${res.id}`);
+                    return;
+                }
+                const cell = startRowElement.cells[column];
+
+                block.style.top = `${cell.offsetTop}px`; 
+                block.style.left = `${cell.offsetLeft}px`;
+                block.style.width = `${cell.offsetWidth}px`; 
+                block.style.height = `${durationRows * cell.offsetHeight - 2}px`;
+                
+                block.addEventListener('dblclick', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    editReservation(parseInt(res.id));
+                });
+                
+                const structureInfo = res.structure === '25x65H4' ? `${res.largeur}*${res.longueur}m H4` : `${res.structure.replace('_', ' ')} ${res.longueur}m`;
+                
+                const oneDay = 24 * 60 * 60 * 1000;
+                const dateToTime = (dateStr) => new Date(dateStr).getTime();
+                
+                const formatToDDMM = (isoDate) => {
+                    const parts = isoDate.split('-');
+                    return `${parts[2]}/${parts[1]}`;
+                };
+                const formatRangeForMarker = (startDate, endDate) => {
+                    if (startDate === endDate) return formatToDDMM(startDate);
+                    return `${formatToDDMM(startDate)} - ${formatToDDMM(endDate)}`;
+                };
+                const totalDurationDays = (dateToTime(res.overallEndDate) - dateToTime(res.overallStartDate)) / oneDay + 1;
+                const prepDurationDays = (dateToTime(res.dateMontageStart) - dateToTime(res.overallStartDate)) / oneDay;
+                const montageDurationDays = (dateToTime(res.dateManifStart) - dateToTime(res.dateMontageStart)) / oneDay;
+                const manifDurationDays = (dateToTime(res.dateDemontageStart) - dateToTime(res.dateManifStart)) / oneDay;
+                const prepHeightPercent = (prepDurationDays / totalDurationDays) * 100;
+                const montageTopPercent = prepHeightPercent;
+                const manifTopPercent = montageTopPercent + (montageDurationDays / totalDurationDays) * 100;
+                let demontageTopPercent = manifTopPercent + (manifDurationDays / totalDurationDays) * 100;
+                let manifCenterTopPercent = manifTopPercent + ((demontageTopPercent - manifTopPercent) / 2);
+                const montageDateRange = formatRangeForMarker(res.dateMontageStart, res.dateMontageEnd);
+                const demontageDateRange = formatRangeForMarker(res.dateDemontageStart, res.dateDemontageEnd);
+                if (currentView === 'week') {
+                    demontageTopPercent += 5;
+                    manifCenterTopPercent -= 2.5;
+                }
+                block.innerHTML = `
+                    <div class="event-block-content prep-part" style="height: ${prepHeightPercent}%;">
+                        <span>Préparation</span>
+                    </div>
+                    <div class="event-block-content main-part" style="top: ${prepHeightPercent}%; height: ${100 - prepHeightPercent}%; background-color: ${eventColor};">
+                    </div>
+                    <div class="event-info-wrapper" style="top: ${manifCenterTopPercent}%;">
+                       <span class="event-line event-contrat">${res.contrat}</span>
+                       <span class="event-line event-ville">${res.ville}</span>
+                       <span class="event-line" style="font-size: 0.9em;">${structureInfo} ${res.plancher}</span>
+                    </div>
+                    <div class="event-marker montage-marker" style="top: ${montageTopPercent}%;">
+                        M <span class="marker-date">${montageDateRange}</span>
+                    </div>
+                    <div class="event-marker demontage-marker" style="top: ${demontageTopPercent}%;">
+                        D <span class="marker-date">${demontageDateRange}</span>
+                    </div>
+                `;
+
+                planningContainer.appendChild(block);
+            }
+            function editReservation(reservationId) {
+                const reservation = reservations.find(r => r.id === reservationId);
+                if (!reservation) return;
+                editingReservationId = reservationId;
+                
+                document.getElementById('contrat').value = reservation.contrat;
+                document.getElementById('ville').value = reservation.ville;
+                document.getElementById('hauteur').value = reservation.hauteur;
+                document.getElementById('plancher').value = reservation.plancher;
+                // NOUVEAU : Charger la valeur de l'interlocuteur
+                document.getElementById('interlocuteur').value = reservation.interlocuteur || 'Erika';
+                document.getElementById('delaiPrep').value = reservation.delaiPrep;
+                document.getElementById('dispo').value = reservation.dispo || 'Non';
+                
+                document.getElementById('structure').value = reservation.structure;
+                handleStructureChange();
+                
+                if (reservation.structure === '25x65H4') {
+                    document.getElementById('longueur').value = reservation.longueur;
+                    document.getElementById('largeurSelect').value = reservation.largeur || '25';
+                    largeurField.style.display = 'block';
+                } else {
+                    document.getElementById('longueur').value = reservation.longueur;
+                    largeurField.style.display = 'none';
+                }
+                
+                const manifRange = `${reservation.dateManifStart.split('-').reverse().join('/')} au ${reservation.dateManifEnd.split('-').reverse().join('/')}`;
+                const montageRange = `${reservation.dateMontageStart.split('-').reverse().join('/')} au ${reservation.dateMontageEnd.split('-').reverse().join('/')}`;
+                const demontageRange = `${reservation.dateDemontageStart.split('-').reverse().join('/')} au ${reservation.dateDemontageEnd.split('-').reverse().join('/')}`;
+                datePickers['dateManif'].setDate(reservation.dateManifStart !== reservation.dateManifEnd ? manifRange : reservation.dateManifStart, true);
+                datePickers['dateMontage'].setDate(reservation.dateMontageStart !== reservation.dateMontageEnd ? montageRange : reservation.dateMontageStart, true);
+                datePickers['dateDemontage'].setDate(reservation.dateDemontageStart !== reservation.dateDemontageEnd ? demontageRange : reservation.dateDemontageStart, true);
+                editModeIndicator.style.display = 'block';
+                cancelEditBtn.style.display = 'inline-block';
+                deleteBtn.style.display = 'inline-block';
+                submitBtn.textContent = 'Modifier la Réservation';
+                
+                document.querySelector('.controls-container').scrollIntoView({ behavior: 'smooth' });
+                
+                Object.values(datePickers).forEach(p => p.redraw());
+            }
+            function handleFormSubmit(event) {
+                event.preventDefault();
+                
+                const parseDateRangeInput = (id) => {
+                    const val = document.getElementById(id).value; 
+                    if (!val) return {};
+                    const dates = val.split(' au ');
+                    const toISO = (dmy) => { 
+                        const p = dmy.split('/'); 
+                        return `${p[2]}-${p[1].padStart(2, '0')}-${p[0].padStart(2, '0')}`; 
+                    };
+                    return { 
+                        start: toISO(dates[0]), 
+                        end: toISO(dates.length > 1 ? dates[1] : dates[0]) 
+                    };
+                };
+                
+                const manif = parseDateRangeInput('dateManif');
+                const montage = parseDateRangeInput('dateMontage');
+                const demontage = parseDateRangeInput('dateDemontage');
+                
+                if (!manif.start || !montage.start || !demontage.start) { 
+                    showErrorModal("Veuillez sélectionner des dates pour toutes les périodes.");
+                    return; 
+                }
+                
+                const longueurValue = parseInt(document.getElementById('longueur').value, 10);
+                const structureValue = document.getElementById('structure').value;
+                const data = {
+                    id: editingReservationId || Date.now(), 
+                    contrat: document.getElementById('contrat').value, 
+                    ville: document.getElementById('ville').value,
+                    structure: structureValue, 
+                    longueur: longueurValue,
+                    largeur: structureValue === '25x65H4' ? document.getElementById('largeurSelect').value : null,
+                    hauteur: document.getElementById('hauteur').value, 
+                    plancher: document.getElementById('plancher').value,
+                    interlocuteur: document.getElementById('interlocuteur').value, // NOUVEAU : Sauvegarde de l'interlocuteur
+                    dateManifStart: manif.start, 
+                    dateManifEnd: manif.end, 
+                    dateMontageStart: montage.start, 
+                    dateMontageEnd: montage.end,
+                    dateDemontageStart: demontage.start, 
+                    dateDemontageEnd: demontage.end,
+                    delaiPrep: parseInt(document.getElementById('delaiPrep').value, 10),
+                    fermes: calculateFermes(longueurValue), // MODIFIÉ : Calcul des fermes pour toutes les structures
+                    dispo: document.getElementById('dispo').value
+                };
+                if (new Date(data.dateMontageStart) > new Date(data.dateManifStart) || new Date(data.dateManifEnd) > new Date(data.dateDemontageStart)) {
+                    showErrorModal("Les dates ne sont pas cohérentes. (Ordre: Montage → Manif → Démontage)");
+                    return;
+                }
+                
+                data.overallStartDate = calculateBusinessDaysBack(data.dateMontageStart, data.delaiPrep);
+                data.overallEndDate = data.dateDemontageEnd;
+                
+                if (data.dispo === 'Oui') {
+                    data.columnIndex = null;
+                } else {
+                    const availableColumn = findAvailableColumn(data.structure, data.overallStartDate, data.overallEndDate, data.hauteur, editingReservationId);
+                    if (availableColumn === -1) { 
+                        const hauteurMsg = data.hauteur === 'H4' ? ' compatible avec la hauteur H4' : '';
+                        showErrorModal(`Aucune colonne disponible${hauteurMsg} pour la structure ${data.structure} sur cette période.`);
+                        return; 
+                    }
+                    data.columnIndex = availableColumn;
+                }
+                
+                if (editingReservationId) {
+                    const index = reservations.findIndex(r => r.id === editingReservationId);
+                    if (index !== -1) {
+                        const oldRes = reservations[index];
+                        const oldGroupKey = getGroupKey(oldRes.structure);
+                        const newGroupKey = getGroupKey(data.structure);
+
+                        // Si la résa était en dispo, on la retire de son ancien groupe
+                        if(oldRes.dispo === 'Oui' && oldGroupKey && dynamicDispoColumns[oldGroupKey]) {
+                            const dispoIndex = dynamicDispoColumns[oldGroupKey].findIndex(d => d.id === editingReservationId);
+                            if(dispoIndex > -1) dynamicDispoColumns[oldGroupKey].splice(dispoIndex, 1);
+                        }
+                        
+                        // On met à jour la réservation principale
+                        reservations[index] = data;
+
+                        // Si la nouvelle résa est en dispo, on l'ajoute au bon groupe
+                        if(data.dispo === 'Oui' && newGroupKey && dynamicDispoColumns[newGroupKey]) {
+                            dynamicDispoColumns[newGroupKey].push(data);
+                        }
+                    }
+                    cancelEdit();
+                } else {
+                    reservations.push(data);
+                    if (data.dispo === 'Oui') {
+                        const groupKey = getGroupKey(data.structure);
+                        if (groupKey && dynamicDispoColumns[groupKey]) {
+                            dynamicDispoColumns[groupKey].push(data);
+                        }
+                    }
+                    form.reset();
+                    populateLongueurOptions();
+                    handleStructureChange();
+                    initializeDatePickers(); 
+                }
+                
+                render();
+            }
+            document.getElementById('weekViewBtn').addEventListener('click', () => switchView('week'));
+            document.getElementById('dayViewBtn').addEventListener('click', () => switchView('day'));
+            structureSelect.addEventListener('change', handleStructureChange);
+            form.addEventListener('submit', handleFormSubmit);
+            cancelEditBtn.addEventListener('click', cancelEdit);
+            deleteBtn.addEventListener('click', showDeleteConfirmation);
+            document.getElementById('confirmDelete').addEventListener('click', confirmDelete);
+            document.getElementById('cancelDelete').addEventListener('click', hideDeleteConfirmation);
+            document.getElementById('closeError').addEventListener('click', hideErrorModal);
+
+            confirmModal.addEventListener('click', (e) => { if (e.target === confirmModal) hideDeleteConfirmation(); });
+            errorModal.addEventListener('click', (e) => { if (e.target === errorModal) hideErrorModal(); });
+
+            populateLongueurOptions();
+            initializeDatePickers();
+            handleStructureChange();
+            planningContainer.classList.add(`view-${currentView}`);
+            render();
+        });
+    </script>
+</body>
+</html>
