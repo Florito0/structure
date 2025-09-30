@@ -128,7 +128,6 @@
 
         /* NOUVEAUX STYLES POUR LA LÉGENDE */
         .legend-container {
-            margin-top: 1.5rem;
             display: flex;
             flex-direction: row;
             align-items: flex-start;
