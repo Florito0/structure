@@ -1243,13 +1243,14 @@
                                 break;
                             case '20M_25M':
                                 baseIndex = 4 + smallDispoCols + 8 + 2 + dispo15MCols + 1 + 10 + 2; // ... + Date(1) + 20/25M(10) + Fermes(1) + Fermes Virtuel(1)
-                                break;
-                            case '25x65H4':
-                                baseIndex = 4 + smallDispoCols + 8 + 2 + dispo15MCols + 1 + 10 + 2 + dispo20MCols + 3; // ... + Domes(1) + Domes V(1) + 25x65(1) + Fermes(1) + Fermes V(1)
-                                break;
-                            case '30x95':
-                                baseIndex = 4 + smallDispoCols + 8 + 2 + dispo15MCols + 1 + 10 + 2 + dispo20MCols + 3 + dispo25x65Cols + 2 + 2; // ... + 30x95(2) + Fermes(1) + Fermes V(1)
-                                break;
+                                case '25x65H4':
+    // Correction : Il y a 5 colonnes à sauter, pas 3 (Domes, Domes Virtuel, 25x65H4, Fermes, Fermes Virtuel)
+    baseIndex = 4 + smallDispoCols + 8 + 2 + dispo15MCols + 1 + 10 + 2 + dispo20MCols + 5;
+    break;
+case '30x95':
+    // Correction : On utilise la même base corrigée (+5) et on ajoute les 4 colonnes de la section 30x95 (30x95(2), Fermes, Fermes Virtuel)
+    baseIndex = 4 + smallDispoCols + 8 + 2 + dispo15MCols + 1 + 10 + 2 + dispo20MCols + 5 + dispo25x65Cols + 4;
+    break;
                         }
 
                         dynamicDispoColumns[key].forEach((res, index) => {
