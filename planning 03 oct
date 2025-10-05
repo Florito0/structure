@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planning SEMAINE NOTE</title>
+<style>
+    body {
+        font-family: sans-serif;
+        line-height: 1.6;
+        margin: 20px;
+        background-color: #f4f4f4;
+        color: #333;
+    }
+    .container {
+        max-width: 1200px;
+        margin: auto;
+        overflow: auto;
+        padding: 0 20px;
+    }
+    .week {
+        margin-bottom: 25px;
+        background: #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border-radius: 5px;
+        overflow: hidden; /* Pour que le radius s'applique bien au h2 */
+    }
+    h1, h2, h3 {
+        text-align: center;
+        color: #333;
+    }
+    h2 {
+        background: #e2e2e2;
+        margin: 0;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center; /* Centrer le texte dans toutes les cellules */
+    }
+    th, .event-name {
+        text-align: left; /* Aligner à gauche pour les en-têtes et noms d'événements */
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+    td[contenteditable="true"] {
+        background-color: #f9f9f9;
+        cursor: pointer;
+    }
+    td[contenteditable="true"]:focus {
+        background-color: #fff;
+        outline: 2px solid #007bff;
+    }
+    .event-name {
+        font-weight: bold;
+        min-width: 200px;
+    }
+    .weekend {
+        background-color: #d4edda !important; /* Vert clair */
+    }
+    .holiday {
+        background-color: #f8d7da !important; /* Rouge clair (pour jours fériés) */
+    }
+    .add-row-btn {
+        display: block;
+        margin: 10px auto;
+        padding: 8px 16px;
+        border: 1px solid #007bff;
+        background-color: #007bff;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .add-row-btn:hover {
+        background-color: #0056b3;
+    }
+    /* Nouvelles couleurs pour montage et démontage */
+    .montage {
+        background-color: #cfe2ff !important; /* Bleu clair */
+        font-weight: bold;
+        color: #004085;
+    }
+    .demontage {
+        background-color: #f5c6cb !important; /* Rouge plus vif pour démontage */
+        font-weight: bold;
+        color: #721c24;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Planning "SEMAINES NOTE"</h1>
+
+    <h3>NOVEMBRE 2025</h3>
+    <div class="week">
+        <h2>SEMAINE 45 : 03 AU 09 NOVEMBRE</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Événement</th>
+                    <th data-date="2025-11-03">03/11</th>
+                    <th data-date="2025-11-04">04/11</th>
+                    <th data-date="2025-11-05">05/11</th>
+                    <th data-date="2025-11-06">06/11</th>
+                    <th data-date="2025-11-07">07/11</th>
+                    <th data-date="2025-11-08">08/11</th>
+                    <th data-date="2025-11-09">09/11</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td contenteditable="true" class="event-name"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="add-row-btn">Ajouter une ligne</button>
+    </div>
+
+    <div class="week">
+        <h2>SEMAINE 46 : 10 AU 16 NOVEMBRE</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Événement</th>
+                    <th data-date="2025-11-10">10/11</th>
+                    <th data-date="2025-11-11">11/11</th>
+                    <th data-date="2025-11-12">12/11</th>
+                    <th data-date="2025-11-13">13/11</th>
+                    <th data-date="2025-11-14">14/11</th>
+                    <th data-date="2025-11-15">15/11</th>
+                    <th data-date="2025-11-16">16/11</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td contenteditable="true" class="event-name"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="add-row-btn">Ajouter une ligne</button>
+    </div>
+
+    <h3>DECEMBRE 2025</h3>
+    <div class="week">
+        <h2>SEMAINE 52 : 22 AU 28 DECEMBRE</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Événement</th>
+                    <th data-date="2025-12-22">22/12</th>
+                    <th data-date="2025-12-23">23/12</th>
+                    <th data-date="2025-12-24">24/12</th>
+                    <th data-date="2025-12-25">25/12</th>
+                    <th data-date="2025-12-26">26/12</th>
+                    <th data-date="2025-12-27">27/12</th>
+                    <th data-date="2025-12-28">28/12</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td contenteditable="true" class="event-name"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="add-row-btn">Ajouter une ligne</button>
+    </div>
+
+    <div class="week">
+        <h2>SEMAINE 01 : 29 AU 04 JANVIER</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Événement</th>
+                    <th data-date="2025-12-29">29/12</th>
+                    <th data-date="2025-12-30">30/12</th>
+                    <th data-date="2025-12-31">31/12</th>
+                    <th data-date="2026-01-01">01/01</th>
+                    <th data-date="2026-01-02">02/01</th>
+                    <th data-date="2026-01-03">03/01</th>
+                    <th data-date="2026-01-04">04/01</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td contenteditable="true" class="event-name"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="add-row-btn">Ajouter une ligne</button>
+    </div>
+    
+    <h3>JANVIER 2026</h3>
+    <div class="week">
+        <h2>SEMAINE 02 : 05 AU 11 JANVIER</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Événement</th>
+                    <th data-date="2026-01-05">05/01</th>
+                    <th data-date="2026-01-06">06/01</th>
+                    <th data-date="2026-01-07">07/01</th>
+                    <th data-date="2026-01-08">08/01</th>
+                    <th data-date="2026-01-09">09/01</th>
+                    <th data-date="2026-01-10">10/01</th>
+                    <th data-date="2026-01-11">11/01</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td contenteditable="true" class="event-name"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="add-row-btn">Ajouter une ligne</button>
+    </div>
+    
+    <h3>JUILLET 2026</h3>
+    <div class="week">
+        <h2>SEMAINE 27 : 29 AU 05 JUILLET</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Événement</th>
+                    <th data-date="2026-06-29">29/06</th>
+                    <th data-date="2026-06-30">30/06</th>
+                    <th data-date="2026-07-01">01/07</th>
+                    <th data-date="2026-07-02">02/07</th>
+                    <th data-date="2026-07-03">03/07</th>
+                    <th data-date="2026-07-04">04/07</th>
+                    <th data-date="2026-07-05">05/07</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="event-name">MORTAGNEAU PERCHE - FOIRE AUX BOUDINS</td>
+                    <td></td>
+                    <td>D</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="event-name">CLISSON - HELLFEST</td>
+                    <td>D</td>
+                    <td>D</td>
+                    <td>D</td>
+                    <td>D</td>
+                    <td>D</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="add-row-btn">Ajouter une ligne</button>
+    </div>
+
+    <div class="week">
+        <h2>SEMAINE 28 : 06 AU 12 JUILLET</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Événement</th>
+                    <th data-date="2026-07-06">06/07</th>
+                    <th data-date="2026-07-07">07/07</th>
+                    <th data-date="2026-07-08">08/07</th>
+                    <th data-date="2026-07-09">09/07</th>
+                    <th data-date="2026-07-10">10/07</th>
+                    <th data-date="2026-07-11">11/07</th>
+                    <th data-date="2026-07-12">12/07</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="event-name">CLISSON - HELLFEST</td>
+                    <td>D</td>
+                    <td>D</td>
+                    <td>D</td>
+                    <td>D</td>
+                    <td>D</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="add-row-btn">Ajouter une ligne</button>
+    </div>
+    
+    <div class="week">
+        <h2>SEMAINE 28 : 13 AU 19 JUILLET</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Événement</th>
+                    <th data-date="2026-07-13">13/07</th>
+                    <th data-date="2026-07-14">14/07</th>
+                    <th data-date="2026-07-15">15/07</th>
+                    <th data-date="2026-07-16">16/07</th>
+                    <th data-date="2026-07-17">17/07</th>
+                    <th data-date="2026-07-18">18/07</th>
+                    <th data-date="2026-07-19">19/07</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td contenteditable="true" class="event-name"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                    <td contenteditable="true"></td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="add-row-btn">Ajouter une ligne</button>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    const holidays = new Set([
+        // 2025
+        '2025-01-01', '2025-04-21', '2025-05-01', '2025-05-08', '2025-05-29', '2025-06-09', '2025-07-14', '2025-08-15', '2025-11-01', '2025-11-11', '2025-12-25', '2025-12-26',
+        // 2026
+        '2026-01-01', '2026-04-06', '2026-05-01', '2026-05-08', '2026-05-14', '2026-05-25', '2026-07-14', '2026-08-15', '2026-11-01', '2026-11-11', '2026-12-25', '2026-12-26',
+    ]);
+
+    function colorCalendar() {
+        document.querySelectorAll('table').forEach(table => {
+            const headers = table.querySelectorAll('thead th[data-date]');
+            headers.forEach((th, index) => {
+                const dateString = th.getAttribute('data-date');
+                const dateParts = dateString.split('-').map(part => parseInt(part, 10));
+                const date = new Date(Date.UTC(dateParts[0], dateParts[1] - 1, dateParts[2]));
+                const dayOfWeek = date.getUTCDay();
+                const columnIndex = index + 1;
+
+                let classToApply = '';
+                if (dayOfWeek === 6 || dayOfWeek === 0) { 
+                    classToApply = 'weekend';
+                }
+                if (holidays.has(dateString)) {
+                    classToApply = 'holiday'; 
+                }
+
+                if (classToApply) {
+                    th.classList.add(classToApply);
+                    const cellsInColumn = table.querySelectorAll(`tbody tr td:nth-child(${columnIndex + 1})`);
+                    cellsInColumn.forEach(cell => {
+                        cell.classList.add(classToApply);
+                    });
+                }
+            });
+        });
+    }
+
+    function addRow(event) {
+        const table = event.target.previousElementSibling;
+        const tbody = table.querySelector('tbody');
+        if (!tbody) return;
+        const newRow = document.createElement('tr');
+        
+        let cellCount = table.querySelector('thead tr').childElementCount;
+        for (let i = 0; i < cellCount; i++) {
+            const cell = document.createElement('td');
+            if (i === 0) {
+                cell.classList.add('event-name');
+            }
+             cell.setAttribute('contenteditable', 'true');
+            newRow.appendChild(cell);
+        }
+        
+        tbody.appendChild(newRow);
+        colorCalendar();
+    }
+    
+    // ================== NOUVELLE FONCTIONNALITÉ ==================
+    // Fonction pour mettre à jour la couleur de la cellule basée sur le contenu
+    function updateCellColor(cell) {
+        // Ne s'applique pas aux cellules de nom d'événement
+        if (cell.tagName === 'TD' && !cell.classList.contains('event-name')) {
+            const text = cell.textContent.trim().toLowerCase();
+            
+            // D'abord, on retire les classes existantes pour éviter les conflits
+            cell.classList.remove('montage', 'demontage');
+
+            if (text === 'm') {
+                cell.classList.add('montage');
+            } else if (text === 'd') {
+                cell.classList.add('demontage');
+            }
+        }
+    }
+
+    // Fonction pour vérifier toutes les cellules au chargement de la page
+    function initializeCellColors() {
+        document.querySelectorAll('td').forEach(cell => {
+            updateCellColor(cell);
+        });
+    }
+
+    // Écouteur d'événement pour la saisie en temps réel (utilise la délégation d'événement)
+    document.querySelector('.container').addEventListener('input', function(event) {
+        // 'event.target' est la cellule que l'utilisateur est en train de modifier
+        updateCellColor(event.target);
+    });
+    // =============================================================
+
+    document.querySelectorAll('.add-row-btn').forEach(button => {
+        button.addEventListener('click', addRow);
+    });
+
+    // Appel des fonctions au chargement
+    colorCalendar();
+    initializeCellColors(); // Appliquer les couleurs "m" et "d" aux cellules déjà remplies
+
+});
+</script>
+
+</body>
+</html>
