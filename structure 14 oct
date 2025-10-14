@@ -1699,6 +1699,47 @@
             confirmModal.addEventListener('click', (e) => { if (e.target === confirmModal) hideDeleteConfirmation(); });
             errorModal.addEventListener('click', (e) => { if (e.target === errorModal) hideErrorModal(); });
             
+// Fonction de déplacement par cliquer-glisser
+            let isDragging = false;
+            let startX, startY, scrollLeft, scrollTop;
+
+            planningContainer.addEventListener('mousedown', (e) => {
+                // Ne pas activer le drag si on clique sur un event-block
+                if (e.target.closest('.event-block')) return;
+                
+                isDragging = true;
+                planningContainer.style.cursor = 'grabbing';
+                planningContainer.style.userSelect = 'none';
+                
+                startX = e.pageX - planningContainer.offsetLeft;
+                startY = e.pageY - planningContainer.offsetTop;
+                scrollLeft = planningContainer.scrollLeft;
+                scrollTop = planningContainer.scrollTop;
+            });
+
+            planningContainer.addEventListener('mouseleave', () => {
+                isDragging = false;
+                planningContainer.style.cursor = 'default';
+            });
+
+            planningContainer.addEventListener('mouseup', () => {
+                isDragging = false;
+                planningContainer.style.cursor = 'default';
+            });
+
+            planningContainer.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+                
+                const x = e.pageX - planningContainer.offsetLeft;
+                const y = e.pageY - planningContainer.offsetTop;
+                const walkX = (x - startX) * 1.5; // Multiplicateur pour la vitesse de déplacement
+                const walkY = (y - startY) * 1.5;
+                
+                planningContainer.scrollLeft = scrollLeft - walkX;
+                planningContainer.scrollTop = scrollTop - walkY;
+            });
+
             generateLegend();
             initializeDatePickers();
             handleStructureChange();
