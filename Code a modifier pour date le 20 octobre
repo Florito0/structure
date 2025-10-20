@@ -1,0 +1,57 @@
+AVANT
+
+
+
+if (currentView === 'week') {
+    demontageTopPercent += 5;
+    manifCenterTopPercent -= 0.5;
+}
+block.innerHTML = `
+    <div class="event-block-content prep-part" style="height: ${prepHeightPercent}%;">
+        <span>Préparation</span>
+    </div>
+    <div class="event-block-content main-part" style="top: ${prepHeightPercent}%; height: ${100 - prepHeightPercent}%; background-color: ${eventColor};">
+    </div>
+    <div class="event-info-wrapper" style="top: ${manifCenterTopPercent}%;">
+       <span class="event-line event-contrat">${res.contrat}</span>
+       <span class="event-line event-ville">${res.ville}</span>
+       <span class="event-line" style="font-size: 0.9em;">${structureInfo}</span>
+    </div>
+    <div class="event-marker montage-marker" style="top: ${montageTopPercent}%;">
+        M <span class="marker-date">${montageDateRange}</span>
+    </div>
+    <div class="event-marker demontage-marker" style="top: ${demontageTopPercent}%;">
+        D <span class="marker-date">${demontageDateRange}</span>
+    </div>
+`;
+
+
+
+APRES
+
+
+
+if (currentView === 'week') {
+    demontageTopPercent += 5;
+    manifCenterTopPercent -= 0.5;
+}
+demontageTopPercent = Math.min(demontageTopPercent, 95);  // Limite à 95% pour éviter la coupure en bas du bloc
+
+block.innerHTML = `
+    <div class="event-block-content prep-part" style="height: ${prepHeightPercent}%;">
+        <span>Préparation</span>
+    </div>
+    <div class="event-block-content main-part" style="top: ${prepHeightPercent}%; height: ${100 - prepHeightPercent}%; background-color: ${eventColor};">
+    </div>
+    <div class="event-info-wrapper" style="top: ${manifCenterTopPercent}%;">
+       <span class="event-line event-contrat">${res.contrat}</span>
+       <span class="event-line event-ville">${res.ville}</span>
+       <span class="event-line" style="font-size: 0.9em;">${structureInfo}</span>
+    </div>
+    <div class="event-marker montage-marker" style="top: ${montageTopPercent}%;">
+        M <span class="marker-date">${montageDateRange}</span>
+    </div>
+    <div class="event-marker demontage-marker" style="top: ${demontageTopPercent}%;">
+        D <span class="marker-date">${demontageDateRange}</span>
+    </div>
+`;
